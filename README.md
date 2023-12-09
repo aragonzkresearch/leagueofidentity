@@ -23,7 +23,7 @@ You can switch to such version using the command:
 ```bash
 nvm install 16.20.2
 ```
-A required package is `noble-curves`(https://github.com/paulmillr/noble-curves).
+A required package is [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install it, run:
 ```bash
 npm install --save @noble-curves@1.2.0
