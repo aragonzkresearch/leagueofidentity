@@ -122,6 +122,9 @@ Verification of token: success.
 aa
 ```
 You should get in the end the recovered message contained in the file ``msg``.
+
+### Group encryption/decryption
+For group encryption/decryption just specify the domain (e.g., `@oldcrypto.com`) instead of a full email. Also, recall that you need a `token` for groups (see above).
 ## TODOs
 * Add signatures as described in the original paper.
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
