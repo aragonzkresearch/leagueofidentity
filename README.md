@@ -3,7 +3,7 @@
 This repository provides a PoC implementation of the ``League of Identity `` (`LoI`)  system described in this [note](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view). 
 
 ``LoI`` is a network of nodes with the following functionality. ``LoI`` publishes what is called a ``master public key`` (``MPK``).
-Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice sends this `access token` to a sufficiently large set of nodes of `LoI` and these nodes reply with a set of `token shares` by means of which Alice can compute a cryptographic `token` corresponding to her email address and the current month (we stress that the `token` is different from the `access token`).
+Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice sends this `access token` to a sufficiently large set of nodes of `LoI` and can request to these nodes a cryptographich ``token`` for her email address and a given month and such set of nodes, upon verifying that the ``access token`` is valid for the request, send back to Alice a set of `token shares` by means of which Alice can compute the `token` corresponding to her email address and the current month (we stress that the `token` is different from the `access token`).
 Bob can use the `MPK` of `LoI` to encrypt a message associated to `alice@gmail.com` and a given month and can publish the resulting ciphertext on a blockchain or send it directly to Alice. 
 Alice can use her `token` to decrypt the ciphertext computed by Bob and recover the secret message.
 
