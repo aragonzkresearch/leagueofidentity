@@ -36,7 +36,7 @@ You first need to run a webserver on the port `5000`, for instance:
 python3 -m http.server 5000
 ```
 
-This is because the `main.js` file that implements the webpage embeds a `Google API key` associated with domain `localhost:5000` so changing port will not work with that `API key`. It is strongly suggested to create a Google developer account and setup your project and `API key`. Search the comment ``// API key`` in ``main.js`` and replace it with your own key.
+This is because the `main.js` file that implements the webpage embeds a `Google API key` associated with domain `localhost:5000` so changing port will not work with that `API key`. It is strongly suggested that you create a Google developer account and setup your own project and `API key`. Search the line containing the comment ``// API key`` in ``main.js`` and replace the corresponding key with your own key.
 Then open the link ``localhost:5000`` in your browser, and click on ``Get Access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
