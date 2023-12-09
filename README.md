@@ -28,7 +28,7 @@ To install it, run:
 ```bash
 npm install --save @noble-curves@1.2.0
 ```
-Note that we fix the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `import` directives with `import` directives).
+Note that we fix the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives).
 
 ### Get a Google access token
 You first need to run a webserver on the port `5000`, for instance:
