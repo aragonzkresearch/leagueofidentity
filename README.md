@@ -100,8 +100,8 @@ Henceforth we will denote by `MPK` the so computed `master public key`.
 So, in the following commands whenever we will write e.g., `MPK` you need to replace it with the previous value. Similarly, for the `token`.
 
 ### Encrypt
-Let us assume that the secret message to encrypt is the string ``aa` and it is contained in the file `msg`.
-Run the following command to encrypt under my email `vinciovino@gmail.com` with the tag of `December 2023`:
+Let us assume that the secret message to encrypt is the string ``aa`` and it is contained in the file `msg`.
+Run the following command to encrypt under my email ``vinciovino@gmail.com`` with the tag of ``December 2023``:
 
 ```bash
 node encrypt.js mpk vinciovino@gmail.com 11.2023 < msg
