@@ -118,8 +118,7 @@ Note that in order to encrypt for `December` we used `11.2023` not `12.2023`. Th
 Now, you can decrypt with the following command:
 ```bash
 node decrypt.js token mpk vinciovino@gmail.com 11.2023 ciphertext
-reconstructed token: af5c3a2d675f8750ea1a416c8064c912ccd46e935e16b31a1906532a1ab95646924c31f153a5e030d40118923e9421f5
-Verification of reconstructed token: success.
+Verification of token: success.
 aa
 ```
 You should get in the end the recovered message contained in the file ``msg``.

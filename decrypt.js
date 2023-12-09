@@ -26,11 +26,10 @@ const h = bls.bls12_381.G1.hashToCurve(id);
 const t1 = bls.bls12_381.pairing(h, mpk);
 const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
 if (bls.bls12_381.fields.Fp12.eql(t1, t2) == false) {
-    console.log("Verification of reconstructed token: failure.");
+    console.log("Verification of token: failure.");
     return;
 }
-console.log("reconstructed token: " + token.toHex());
-console.log("Verification of reconstructed token: success.");
+console.log("Verification of token: success.");
 const g_id = bls.bls12_381.pairing(token, A);
 var B_computed = bls.bls12_381.fields.Fp12.toBytes(g_id);
 
