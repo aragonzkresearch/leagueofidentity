@@ -9,7 +9,7 @@ Alice can use her `token` to decrypt the ciphertext computed by Bob and recover 
 
 Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. If `@oldcrypto.com` is a Google Bussiness domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
 
-Moreover, the token can be used by Alice to sign transactions over blockchains so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
+Moreover, the token can be used by Alice to sign transactions over blockchains (e.g. `Cosmos` ones) so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
 For instance the `DAO` of `@oldcrypto.com` can be created in the obvious way.
 LoI can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town.
 
