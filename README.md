@@ -1,6 +1,6 @@
 # League of Identity - PoC
 ## Overview
-This repository provides an implementation of the ``League of Identity `` (`LoI`)  system described in this [note](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view). 
+This repository provides a PoC implementation of the ``League of Identity `` (`LoI`)  system described in this [note](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view). 
 
 ``LoI`` is a network of nodes with the following functionality.
 Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice sends this `access token` to a sufficiently large set of nodes of `LoI` and these nodes reply with a set of `token shares` by means of which Alice can compute a cryptographic `token` corresponding to her email address and the current month (we stress that the `token` is different from the `access token`).
