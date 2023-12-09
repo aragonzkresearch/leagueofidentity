@@ -1,5 +1,10 @@
 // usage:
 // node server.js port share
+
+// TODO: in real apps the server should check
+// that the token is with respect to the same client ID for which it should be
+// Concretely, check that the 'azp' field returned by the verification endpoint equals the client ID in main.js
+
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
