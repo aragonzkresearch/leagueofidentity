@@ -34,7 +34,7 @@ npm install --save nocache
 npm install --save cors
 npm install --save @noble-curves@1.2.0
 ```
-Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues installing fetch, try with the version `1.1.0` that we used for the tests.
+Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
 
 ### Get a Google access token
 You first need to run a webserver on the port `5000`, for instance:
