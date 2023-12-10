@@ -20,13 +20,18 @@ const commander = require('commander');
 
 commander
     .version('1.0.0', '-v, --version')
-    .usage('-p <value> -s <value>')
+    .usage('-p <value> -s <value> [OPTIONS]')
     .requiredOption('-p, --port <value>', 'port on which to listen.')
     .requiredOption('-s, --share <value>', 'share of the master secret key.')
+    .option('-P, --provider <value>', 'provider (currently only \"google\" is supported).')
     .parse(process.argv);
 
 const options = commander.opts();
-
+var provider;
+if (options.provider && options.provider !== "google") {
+    console.error("Supported providers: google.");
+    process.exit(1);
+} else provider = "google";
 app.use(nocache());
 app.use(cors());
 app.listen(options.port, () => {
@@ -83,11 +88,11 @@ function ComputeTokenShare(email, share, month, year, group) {
         var share_decoded = utils.bytesToNumberBE(utils.hexToBytes(share));
         pk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(share_decoded);
         if (group === "1") email = email.split('@')[1];
-        const msg = hashes.utf8ToBytes("LoI..google.." + email + ".." + month + ".." + year);
+        const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year);
         var hash = bls.bls12_381.G1.hashToCurve(msg);
         //hash=bls.bls12_381.G1.ProjectivePoint.BASE;
         hash = hash.multiply(share_decoded);
-        return "LoI..google.." + email + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex();
+        return "LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex();
     } catch (err) {
 
         console.error(err);

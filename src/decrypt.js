@@ -19,13 +19,18 @@ commander
     .requiredOption('-e, --email <value>', 'email or domain.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
+    .option('-P, --provider <value>', 'provider (currently only \"google\" is supported).')
     .parse(process.argv);
 
 const options = commander.opts();
+var provider;
+if (options.provider && options.provider !== "google") {
+    console.error("Supported providers: google.");
+    process.exit(1);
+} else provider = "google";
 
 const month = options.month.split('.')[0];
 const year = options.month.split('.')[1];
-const provider = "google";
 const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const email = options.email;

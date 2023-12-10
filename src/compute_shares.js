@@ -8,11 +8,11 @@ const mod = require("@noble/curves/abstract/modular");
 const commander = require('commander');
 
 commander
-  .version('1.0.0', '-v, --version')
-  .usage('-t <value> -n <value>')
-  .requiredOption('-t, --threshold <value>', 'threshold of nodes required to reconstruct the master secret key.')
-  .requiredOption('-n, --no_nodes <value>', 'total number of nodes.')
-  .parse(process.argv);
+    .version('1.0.0', '-v, --version')
+    .usage('-t <value> -n <value>')
+    .requiredOption('-t, --threshold <value>', 'threshold of nodes required to reconstruct the master secret key.')
+    .requiredOption('-n, --no_nodes <value>', 'total number of nodes.')
+    .parse(process.argv);
 
 const options = commander.opts();
 const A = [];
@@ -31,7 +31,7 @@ for (let i = 1; i < options.threshold; i++) {
 }
 
 privtmp = bls.bls12_381.utils.randomPrivateKey();
-derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); 
+derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48);
 A[0] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
 const fp = mod.Field(bls.bls12_381.params.r);
 console.log("master secret key: " + utils.bytesToHex(fp.toBytes(A[0])));
