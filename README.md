@@ -25,7 +25,7 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a standalone version is embedded in the `web` folder.
-For the `node.js` part the required packages are `fetch, express, nocache, cors` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
