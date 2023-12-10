@@ -12,7 +12,7 @@ Similarly, the token can be associated to a group. For instance, if Alice belong
 
 Moreover, the token can be used by Alice to sign transactions over blockchains (e.g. `Cosmos` ones) so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
 For instance the `DAO` of `@oldcrypto.com` can be created in the obvious way.
-`LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town. As another example, `LoI` could issue tokens only to valid Instagram accounts with 1 million of followers thus creating a `DAO of Influencers`.
+`LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town. As another example, `LoI` could issue tokens only to valid Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
 
 
 ## Running a demo
