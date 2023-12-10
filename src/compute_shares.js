@@ -15,14 +15,14 @@ for (let i = 1; i < process.argv[2]; i++) {
 
     privtmp = bls.bls12_381.utils.randomPrivateKey();
 
-    derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); // 48 bytes for 32-byte privtmp
+    derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); // 48 bytes for 32-byte input
     A[i] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
     console.log("DEBUG: " + i + "-th coefficient of the " + (process.argv[2] - 1) + "-degree polynomial: " + A[i]);
 
 }
 
 privtmp = bls.bls12_381.utils.randomPrivateKey();
-derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); // 48 bytes for 32-byte privtmp
+derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); 
 A[0] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
 const fp = mod.Field(bls.bls12_381.params.r);
 console.log("master secret key: " + utils.bytesToHex(fp.toBytes(A[0])));
