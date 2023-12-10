@@ -1,5 +1,5 @@
 // usage:
-// node get_token.js -T token  -t t -n n -l i_1 server1_addr:port ... i_t servert_addr:port month.year -g  
+// node get_token.js -A access_token  -t t -n n -l i_1 server1_addr:port ... i_t servert_addr:port month.year -g  
 // where token is the provider's token you get from the webpage, t and n are the parameters for the t out of n secret sharing and the following is the list of pairs consisting of indices and addresses (with ports) of the t servers to contact to get the shares needed to reconstruct the LoI token and month.year is field to request a token for the current month.year tag (setting month.year to "now") or to an old month.year tag, and group is a 0/1 flag to indicate whether the identity should be for thegroup (e.g., if the email is me@mycompany.com, if group=1 the identity will be set to mycompany.com).
 
 const bls = require('@noble/curves/bls12-381');
@@ -14,8 +14,8 @@ const commander = require('commander');
 
 commander
     .version('1.0.0', '-v, --version')
-    .usage('-T <value> -t <value> -n <value> -l list [OPTIONS]')
-    .requiredOption('-T, --token <value>', 'token.')
+    .usage('-A <value> -t <value> -n <value> -l list [OPTIONS]')
+    .requiredOption('-A, --access_token <value>', 'access token.')
     .requiredOption('-t, --threshold <value>', 'threshold of nodes required to reconstruct the master secret key.')
     .requiredOption('-n, --no_nodes <value>', 'total number of nodes.')
     .requiredOption('-l, --list <value...>', 'list of t values of the form i_1 server_1:port_1 ... i_t server_t:port_t, where t is the given threshold specified by the -t argument and each index i_1, ..., i_t is an integer between 1 and n, where n is the value specified by the -n argument.')
@@ -52,7 +52,7 @@ for (let i = 0; i < options.threshold; i++) {
 const group = !options.group ? "0" : "1";
 const Month = !options.month ? "now" : options.month; // Month is "now" or a string of the form month.year with month between 0 and 11 and year of the form XXXX
 var flag = 1;
-var email, google, month, year;
+var email, Provider, month, year;
 var pk = [];
 var hash = [];
 var Q = [];
@@ -77,7 +77,7 @@ try {
         Q[i] = BigInt(Indices[i]);
 
         //fetch(process.argv[6 + 2 * i] + "/" + group + "/" + date_path + "/" + process.argv[2]).then(function(response) {
-        fetch(Addresses[i] + "/" + group + "/" + date_path + "/" + options.token).then(function(response) {
+        fetch(Addresses[i] + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
             if (!response.ok) {
                 //console.error("Server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + ")" + " unavailable. Response status: " + response.status + ". Try later");
                 console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " unavailable. Response status: " + response.status + ". Try later");
@@ -94,8 +94,8 @@ try {
                     } else if (text.split('..')[3] != month) throw ("Inconsistent values received from different servers");
                     if (!year) year = text.split('..')[4];
                     else if (text.split('..')[4] != year) throw ("Inconsistent values received from different servers");
-                    if (!google) google = text.split('..')[1];
-                    else if (text.split('..')[1] != google) throw ("Inconsistent values received by different servers");
+                    if (!Provider) Provider = text.split('..')[1];
+                    else if (text.split('..')[1] != Provider) throw ("Inconsistent values received by different servers");
 
                     pk[Q[i]] = bls.bls12_381.G2.ProjectivePoint.fromHex(text.split('..')[5]);
                     hash[Q[i]] = bls.bls12_381.G1.ProjectivePoint.fromHex(text.split('..')[6]);
@@ -137,6 +137,10 @@ function ComputeLagrangeCoefficients(lambda, t, Q) {
 }
 
 function Finalize() {
+    if (Provider != provider) {
+        console.error("Received token shares are for provider " + Provider + " but you requested a token for provider " + provider);
+        process.exit(1);
+    }
     ComputeLagrangeCoefficients(lambda, options.threshold, Q);
     var tmp = bls.bls12_381.G2.ProjectivePoint.BASE.subtract(bls.bls12_381.G2.ProjectivePoint.BASE);
     var tmp2 = bls.bls12_381.G1.ProjectivePoint.BASE.subtract(bls.bls12_381.G1.ProjectivePoint.BASE);
@@ -149,7 +153,7 @@ function Finalize() {
     var mpk = tmp;
     var token = tmp2;
     console.log("reconstructed master public key: " + mpk.toHex());
-    const msg = hashes.utf8ToBytes("LoI.." + google + ".." + email + ".." + month + ".." + year);
+    const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year);
     const h = bls.bls12_381.G1.hashToCurve(msg);
     const t1 = bls.bls12_381.pairing(h, mpk);
     const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
