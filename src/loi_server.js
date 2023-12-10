@@ -1,5 +1,5 @@
 // usage:
-// node server.js port share
+// node server.js -p port -s share
 
 // TODO: in real apps the server should check
 // that the token is with respect to the same client ID for which it should be
@@ -16,11 +16,21 @@ const express = require('express');
 const app = express();
 const nocache = require('nocache');
 const cors = require('cors');
+const commander = require('commander');
+
+commander
+    .version('1.0.0', '-v, --version')
+    .usage('-p <value> -s <value>')
+    .requiredOption('-p, --port <value>', 'port on which to listen.')
+    .requiredOption('-s, --share <value>', 'share of the master secret key.')
+    .parse(process.argv);
+
+const options = commander.opts();
 
 app.use(nocache());
 app.use(cors());
-app.listen(process.argv[2], () => {
-    console.log('listening on port ' + process.argv[2]);
+app.listen(options.port, () => {
+    console.log('listening on port ' + options.port);
 });
 
 app.get('/:group/:date/:token', async (req, res) => {
@@ -29,31 +39,30 @@ app.get('/:group/:date/:token', async (req, res) => {
         fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + req.params.token)
             .then(function(response) {
                 if (!response.ok) {
-                    console.log("Error. Response status: " + response.status);
+                    console.error("Error. Response status: " + response.status);
                     res.sendStatus(400);
                     return;
                 }
                 response.json().then(function(text) {
                     if (text.email_verified && text.email_verified === 'true') {
-var year,month,curyear,curmnonth;
-const date=new Date();
-curyear=date.getFullYear();
-curmonth=date.getMonth();
-if (req.params.date!=="now")
-{
-year=req.params.date.split('.')[1];
-month=req.params.date.split('.')[0];
-if (year>curyear || month>curmonth){
-                    res.sendStatus(400);
- console.log("Invalid token request received by client.");
-return;
-}
-} else{
-year=curyear;
-month=curmonth;
-}
+                        var year, month, curyear, curmnonth;
+                        const date = new Date();
+                        curyear = date.getFullYear();
+                        curmonth = date.getMonth();
+                        if (req.params.date !== "now") {
+                            year = req.params.date.split('.')[1];
+                            month = req.params.date.split('.')[0];
+                            if (year > curyear || month > curmonth) {
+                                res.sendStatus(400);
+                                console.error("Invalid token request received by client.");
+                                return;
+                            }
+                        } else {
+                            year = curyear;
+                            month = curmonth;
+                        }
 
-                        var st = ComputeTokenShare(text.email, process.argv[3],month,year,req.params.group);
+                        var st = ComputeTokenShare(text.email, options.share, month, year, req.params.group);
                         res.send(st);
                     } else
                         res.sendStatus(400);
@@ -62,18 +71,18 @@ month=curmonth;
                 });
             });
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 
 
 });
 
-function ComputeTokenShare(email, share,month,year,group) {
+function ComputeTokenShare(email, share, month, year, group) {
     try {
-        console.log("share:" + share);
+        console.log("token share to transmit to client:" + share);
         var share_decoded = utils.bytesToNumberBE(utils.hexToBytes(share));
         pk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(share_decoded);
-if (group==="1") email=email.split('@')[1];
+        if (group === "1") email = email.split('@')[1];
         const msg = hashes.utf8ToBytes("LoI..google.." + email + ".." + month + ".." + year);
         var hash = bls.bls12_381.G1.hashToCurve(msg);
         //hash=bls.bls12_381.G1.ProjectivePoint.BASE;
@@ -81,6 +90,6 @@ if (group==="1") email=email.split('@')[1];
         return "LoI..google.." + email + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex();
     } catch (err) {
 
-        console.log(err);
+        console.error(err);
     }
 }

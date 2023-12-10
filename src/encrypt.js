@@ -1,5 +1,5 @@
 // usage:
-// node encrypt.js mpk email (or domain) month.year 
+// node encrypt.js -k mpk -e email (or domain) -m month.year 
 // the message is taken from the stdin
 
 const bls = require('@noble/curves/bls12-381');
@@ -10,11 +10,23 @@ const utils = require("@noble/curves/abstract/utils");
 const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
-const month = process.argv[4].split('.')[0];
-const year = process.argv[4].split('.')[1];
+const commander = require('commander');
+
+commander
+    .version('1.0.0', '-v, --version')
+    .usage('-k <value> -e <value> -m <value>')
+    .requiredOption('-k, --key <value>', 'the master public key.')
+    .requiredOption('-e, --email <value>', 'email or domain.')
+    .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
+    .parse(process.argv);
+
+const options = commander.opts();
+
+const month = options.month.split('.')[0];
+const year = options.month.split('.')[1];
 const provider = "google";
-const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(process.argv[2]);
-const email = process.argv[3];
+const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
+const email = options.email;
 
 
 const randtmp = bls.bls12_381.utils.randomPrivateKey();

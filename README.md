@@ -27,13 +27,14 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a standalone version is embedded in the `web` folder.
-For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
 npm install --save fetch
 npm install --save nocache
 npm install --save cors
+npm install --save commander
 npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
@@ -64,7 +65,7 @@ Let us assume henceforth that `t=2` and `n=3`.
 Run the following command:
 
 ```bash
-node compute_shares.js 2 3
+node compute_shares.js -t 2 -n 3
 ```
 You will get an output like:
 ```bash
@@ -84,21 +85,21 @@ You can replace it with a real `DKG` procedure without trusted dealer but for si
 
 Now, you can run locally 3 `LoI` nodes with the following commands:
 ```bash
-node loi_server.js 8001 share1 &
-node loi_server.js 8002 share2 &
-node loi_server.js 8001 share3 &
+node loi_server.js -p 8001 -s share1 &
+node loi_server.js -p 8002 -s share2 &
+node loi_server.js -p 8003 -s share3 &
 ```
 Do not forget to replace `share1`, `share2`, `share3` with the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
-Each server is associated resp. with the index `1,2,3`.
+Each server is implicitly associated resp. with the index `1,2,3`.
 ### Get a `token` from `LoI`.
 Now you can run the following:
 ```bash
-node get_token.js access_token 2 3 2 http://localhost:8002 3 http://localhost:8003 now 0
+node get_token.js -T access_token -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003
 ```
 Do not forget to repalce ``access_token``  with the value computed before (see above).
-The first two numerical parameters are the values `t=2,n=3`. Then we use `2 http://localhost:8002` and `3 http://localhost:8003` to denote that we want to request the `token shares` from the nodes with indices `2` and `3`.
-If you want to do the request e.g. to the nodes `1,3` you would need to replace the parameters `2 http://localhost:8002 3 http://localhost:8003` with `1 http://localhost:8001 3 http://localhost:8003`.
-Here, ``now`` indicates we want a `token` for the current month. Replace it with a string of the form `month.year` to get a `token` for a past month. Moreover, `0` indicates that we do not want a `token` for a group. Replace it with `1` if you want a `token` for a group.
+The argument `-T` specifies the `access_token`. The arguments `-t` and `-n` first correspond to the aforementioned values `t=2,n=3`. The argument `-l` specifies a list `2 http://localhost:8002` and `3 http://localhost:8003` to denote that we want to request the `token shares` from the nodes with indices `2` and `3`.
+If you want to do the request e.g. to the nodes `1,3` you would need to replace `-l 2 http://localhost:8002 3 http://localhost:8003` with `-l 1 http://localhost:8001 3 http://localhost:8003`.
+Here, we request a `token` for the current month. Use the option `-m month.year` to get a `token` for a past month. The value `month` in the string `month.year` is an integer between 0 and 11 and `year` has the form `XXXX`. Moreover, use the option `-g` if you want a `token` for a group.
 
 You will get an output like: 
 ```bash
@@ -117,7 +118,7 @@ Let us assume that the secret message to encrypt is the string ``aa`` and it is 
 Run the following command to encrypt under my email ``vinciovino@gmail.com`` with the tag of ``December 2023``:
 
 ```bash
-node encrypt.js mpk vinciovino@gmail.com 11.2023 < msg
+node encrypt.js -k mpk -e vinciovino@gmail.com -m 11.2023 < msg
 ```
 You will get something like:
 ```bash
@@ -130,7 +131,7 @@ Note that in order to encrypt for `December` we used `11.2023` not `12.2023`. Th
 ### Decrypt
 Now, you can decrypt with the following command:
 ```bash
-node decrypt.js token mpk vinciovino@gmail.com 11.2023 ciphertext
+node decrypt.js -T token -k mpk -e vinciovino@gmail.com -m 11.2023 -c ciphertext
 Verification of token: success.
 aa
 ```

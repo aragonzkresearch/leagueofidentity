@@ -1,23 +1,32 @@
-// node compute_shares.js t n
+// node compute_shares.js -t t -n n
 // t is the threshold who can reconstruct the master secret key and n is the number of nodes of LoI network
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
 const utils = require("@noble/curves/abstract/utils");
 const mod = require("@noble/curves/abstract/modular");
+const commander = require('commander');
 
+commander
+  .version('1.0.0', '-v, --version')
+  .usage('-t <value> -n <value>')
+  .requiredOption('-t, --threshold <value>', 'threshold of nodes required to reconstruct the master secret key.')
+  .requiredOption('-n, --no_nodes <value>', 'total number of nodes.')
+  .parse(process.argv);
 
+const options = commander.opts();
 const A = [];
 const s = [];
+
 var privtmp;
 var derived;
-for (let i = 1; i < process.argv[2]; i++) {
+for (let i = 1; i < options.threshold; i++) {
 
     privtmp = bls.bls12_381.utils.randomPrivateKey();
 
     derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); // 48 bytes for 32-byte input
     A[i] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
-    console.log("DEBUG: " + i + "-th coefficient of the " + (process.argv[2] - 1) + "-degree polynomial: " + A[i]);
+    console.log("DEBUG: " + i + "-th coefficient of the " + (options.threshold - 1) + "-degree polynomial: " + A[i]);
 
 }
 
@@ -30,11 +39,11 @@ const mpk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(fp.create(A[0]));
 console.log("master public key: " + mpk.toHex());
 
 var tmp;
-for (let i = 1n; i <= process.argv[3]; i++) {
+for (let i = 1n; i <= options.no_nodes; i++) {
     tmp = fp.ZERO;
 
     let I = fp.create(i);
-    for (let j = 0n; j < process.argv[2]; j++) {
+    for (let j = 0n; j < options.threshold; j++) {
         let J = fp.create(j);
         let Aj = fp.create(A[j]);
         tmp = fp.add(fp.mul(Aj, fp.pow(I, J)), tmp);
@@ -62,15 +71,15 @@ function ComputeLagrangeCoefficients(lambda, t, Q) {
 }
 var Q = [];
 var lambda = [];
-for (i = 0n; i < process.argv[2]; i++) Q[i] = i + 1n;
+for (i = 0n; i < options.threshold; i++) Q[i] = i + 1n;
 Q[0] = 1n;
 Q[1] = 2n;
 Q[2] = 4n;
-ComputeLagrangeCoefficients(lambda, process.argv[2], Q);
+ComputeLagrangeCoefficients(lambda, options.threshold, Q);
 const sk = [];
 const pk = [];
 tmp = bls.bls12_381.G2.ProjectivePoint.BASE.subtract(bls.bls12_381.G2.ProjectivePoint.BASE);
-for (i = 0n; i < process.argv[2]; i++) {
+for (i = 0n; i < options.threshold; i++) {
     sk[Q[i]] = fp.mul(s[Q[i]], lambda[Q[i]]);
     pk[Q[i]] = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(sk[Q[i]]);
     tmp = tmp.add(pk[Q[i]]);

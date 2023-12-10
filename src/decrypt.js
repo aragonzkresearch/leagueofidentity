@@ -1,5 +1,5 @@
 // usage:
-// node decrypt.js token mpk email (or domain) month.year ciphertext
+// node decrypt.js -T token -k mpk -e email (or domain) -m month.year -c ciphertext
 
 const bls = require('@noble/curves/bls12-381');
 const hkdf = require("@noble/hashes/hkdf");
@@ -9,13 +9,27 @@ const utils = require("@noble/curves/abstract/utils");
 const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
-const month = process.argv[5].split('.')[0];
-const year = process.argv[5].split('.')[1];
+const commander = require('commander');
+
+commander
+    .version('1.0.0', '-v, --version')
+    .usage('-T <value> -k <value> -e <value> -m <value> -c <value>')
+    .requiredOption('-T, --token <value>', 'the token.')
+    .requiredOption('-k, --key <value>', 'the master public key.')
+    .requiredOption('-e, --email <value>', 'email or domain.')
+    .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
+    .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
+    .parse(process.argv);
+
+const options = commander.opts();
+
+const month = options.month.split('.')[0];
+const year = options.month.split('.')[1];
 const provider = "google";
-const token = bls.bls12_381.G1.ProjectivePoint.fromHex(process.argv[2]);
-const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(process.argv[3]);
-const email = process.argv[4];
-const ciphertext = process.argv[6];
+const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
+const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
+const email = options.email;
+const ciphertext = options.ciphertext;
 const A = bls.bls12_381.G2.ProjectivePoint.fromHex(ciphertext.split('.')[1]);
 const B = ciphertext.split('.')[2];
 const length = parseInt(ciphertext.split('.')[0]);
