@@ -52,8 +52,8 @@ Copy the so obtained ``access token`` in your clipboard. Note that it has a vali
 In this example I computed the token for my email ``vinciovino@gmail.com``.
 
 
-Observe that in this example we are using an `http` website without `TLS`.
-This is only for simplicity. Indeed, since we are using `OAuth implicit flow`, passing through non-secure connections could make your application insecure.
+Observe that in our example we are using a `http` website without `TLS`.
+This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
 ### Compute the shares and run the `LoI` nodes
 Henceforth, we assume to be working in the folder `src`.
 `LoI` is associated to two parameters: `n`, the number of nodes in the network, and `t`, the threshold of nodes who can reconstruct the secrets and break the security.
