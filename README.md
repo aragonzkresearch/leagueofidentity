@@ -33,10 +33,11 @@ Note that we fix the version `1.2.0` we used for the tests. You can try to use n
 ### Get a Google access token
 You first need to run a webserver on the port `5000`, for instance:
 ```bash
+cd web
 python3 -m http.server 5000
 ```
 
-This is because the `main.js` file that implements the webpage embeds a `Google API key` (a.k.a. `client id`) associated with domain `localhost:5000` so changing port will not work with that `API key`. It is strongly suggested that you create a Google developer account and setup your own project and `API key`. Search the line containing the comment ``// API key`` in ``main.js`` and replace the corresponding key with your own key.
+This is because the `main.js` file that implements the webpage embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` .
 Then open the link ``localhost:5000`` in your browser, and click on ``Get Access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
@@ -49,6 +50,7 @@ In this example I computed the token for my email ``vinciovino@gmail.com``.
 Observe that in this example we are using an `http` website without `TLS`.
 This is only for simplicity. Indeed, since we are using `OAuth implicit flow`, passing through non-secure connections could make your application insecure.
 ### Compute the shares and run the `LoI` nodes
+Henceforth, we assume to be working in the folder `src`.
 `LoI` is associated to two parameters: `n`, the number of nodes in the network, and `t`, the threshold of nodes who can reconstruct the secrets and break the security.
 Let us assume henceforth that `t=2` and `n=3`.
 Run the following command:
