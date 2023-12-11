@@ -1,3 +1,5 @@
+const CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
+
 document.getElementById("instructions").addEventListener("click", async () => {
     document.getElementById("status2").style.color = "white";
     document.getElementById("status3").style.color = "white";
@@ -7,11 +9,7 @@ document.getElementById("instructions").addEventListener("click", async () => {
     status3.innerText = "";
     status4.innerText = "";
     status5.innerText = "";
-    setTimeout(() => status2.innerText = "*Connect*\nClick on", 100);
-    setTimeout(() => status2.innerText = "*Connect*\nClick on \"Get Google access token\" to log", 300);
-    setTimeout(() => status2.innerText = "*Connect*\nClick on \"Get Google access token\" to log into your Google account and get the access token.\n", 300);
-    setTimeout(() => status2.innerText = "*Connect*\nClick on \"Get Google access token\" to log into your Google account and get the access token.\nYou can use the access token with the command lines tool of League of Identity.\n\n", 300);
-    setTimeout(() => status2.innerText = "*Connect*\nClick on \"Get Google access token\" to log into your Google account and get the access token.\nYou can use the access token with the command lines tool of League of Identity.\n\n*Logout*\nClick on \"Logout\" to logout from your Google account.", 300);
+    status2.innerText = "*Connect*\nClick on \"Get access token\" to log into your Google account and get the access token.\nYou can use the access token with the command lines tool of League of Identity.\n\n*Logout*\nClick on \"Logout\" to logout from your account.";
 
 });
 
@@ -30,7 +28,7 @@ hello.on('auth.logout', function() {
 
 document.getElementById("accountbutton").addEventListener("click", async () => {
     hello.init({
-        google: "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com" // client id
+        google: CLIENT_ID
     });
     hello.on('auth.login', function(auth) {
 

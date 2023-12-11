@@ -79,8 +79,8 @@ try {
         //fetch(process.argv[6 + 2 * i] + "/" + group + "/" + date_path + "/" + process.argv[2]).then(function(response) {
         fetch(Addresses[i] + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
             if (!response.ok) {
-                //console.error("Server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + ")" + " unavailable. Response status: " + response.status + ". Try later");
-                console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " unavailable. Response status: " + response.status + ". Try later");
+                //console.error("Server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + ")" + " response status: " + response.status + ". Try later");
+                console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " response status: " + response.status + ". Try later.");
                 process.exit(1);
 
             } else {

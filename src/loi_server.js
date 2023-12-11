@@ -5,6 +5,7 @@
 // that the token is with respect to the same client ID for which it should be
 // Precisely, check that the 'azp' field returned by the verification endpoint equals the client ID in ../web/main.js
 
+const CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
@@ -49,6 +50,12 @@ app.get('/:group/:date/:token', async (req, res) => {
                     return;
                 }
                 response.json().then(function(text) {
+                    if (!text.azp || text.azp != CLIENT_ID) {
+                        res.sendStatus(400);
+                        console.error("Token request with invalid client id.");
+                        return;
+
+                    }
                     if (text.email_verified && text.email_verified === 'true') {
                         var year, month, curyear, curmnonth;
                         const date = new Date();

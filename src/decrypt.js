@@ -16,7 +16,7 @@ commander
     .usage('-T <value> -k <value> -e <value> -m <value> -c <value>')
     .requiredOption('-T, --token <value>', 'the token.')
     .requiredOption('-k, --key <value>', 'the master public key.')
-    .requiredOption('-e, --email <value>', 'email or domain.')
+    .requiredOption('-e, --email <value>', 'email or domain. This value can also be a user id depending on the provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
     .option('-P, --provider <value>', 'provider (currently only \"google\" is supported).')

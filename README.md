@@ -47,7 +47,7 @@ python3 -m http.server 5000
 ```
 
 This is because the `main.js` file that implements the webpage embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` .
-Then open the link ``localhost:5000`` in your browser, and click on ``Get Access Token``, you should get some view like the following:
+Then open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
 <br>
