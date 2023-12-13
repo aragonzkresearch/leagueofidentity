@@ -21,15 +21,16 @@ commander
     .requiredOption('-l, --list <value...>', 'list of t values of the form i_1 server_1:port_1 ... i_t server_t:port_t, where t is the given threshold specified by the -t argument and each index i_1, ..., i_t is an integer between 1 and n, where n is the value specified by the -n argument.')
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-g, --group', 'request a group token.')
-    .option('-P, --provider <value>', 'provider (currently only \"google\" is supported).')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\"). Default is \"google\".')
     .parse(process.argv);
 
 const options = commander.opts();
 var provider;
-if (options.provider && options.provider !== "google") {
-    console.error("Supported providers: google.");
+if (options.provider && options.provider !== "google" && options.provider !== "facebook") {
+    console.error("Supported providers: google, facebook.");
     process.exit(1);
-} else provider = "google";
+} else if (!options.provider) provider = "google";
+else provider = options.provider;
 if (options.list.length != options.threshold * 2) {
     commander.help({
         error: true
@@ -77,7 +78,7 @@ try {
         Q[i] = BigInt(Indices[i]);
 
         //fetch(process.argv[6 + 2 * i] + "/" + group + "/" + date_path + "/" + process.argv[2]).then(function(response) {
-        fetch(Addresses[i] + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
+        fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
             if (!response.ok) {
                 //console.error("Server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + ")" + " response status: " + response.status + ". Try later");
                 console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " response status: " + response.status + ". Try later.");
@@ -87,8 +88,10 @@ try {
                 response.text().then(function(text) {
                     //console.log("Value received by server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + "): " + text);
                     console.log("Value received by server " + Indices[i] + " (" + Addresses[i] + "): " + text);
-                    if (!email) email = text.split('..')[2];
-                    else if (text.split('..')[2] != email) throw ("Inconsistent values received from different servers");
+                    //if (!email) email = text.split('..')[2];
+                    if (!email) email = Buffer.from(utils.hexToBytes(text.split('..')[2])).toString('utf8');
+                    //else if (text.split('..')[2] != email) throw ("Inconsistent values received from different servers");
+                    else if (Buffer.from(utils.hexToBytes(text.split('..')[2])).toString('utf8') != email) throw ("Inconsistent values received from different servers");
                     if (!month) {
                         month = text.split('..')[3];
                     } else if (text.split('..')[3] != month) throw ("Inconsistent values received from different servers");

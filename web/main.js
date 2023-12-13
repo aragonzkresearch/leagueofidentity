@@ -1,4 +1,5 @@
-const CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com"; // (google) client id
+const FB_CLIENT_ID = "377291984666448"; // (facebook) client id
 
 document.getElementById("instructions").addEventListener("click", async () => {
     document.getElementById("status2").style.color = "white";
@@ -26,28 +27,34 @@ hello.on('auth.logout', function() {
     document.getElementById("status1").innerText = "disconnected";
 });
 
+hello.init({
+    google: GOOGLE_CLIENT_ID,
+    facebook: FB_CLIENT_ID
+});
 document.getElementById("accountbutton").addEventListener("click", async () => {
-    hello.init({
-        google: CLIENT_ID
-    });
-    hello.on('auth.login', function(auth) {
+    var network = document.getElementById("menu").value;
+    const options = (network === "google") ? {
+        scope: 'email'
+    } : {
+        scope: 'email, public_profile'
+    };
 
-        console.log(hello('google').getAuthResponse());
 
-        hello(auth.network).api('/me').then(function(resp) {
+
+    hello(network).login(options).then(function() {
+
+        console.log(hello(network).getAuthResponse());
+
+        hello(network).api('/me').then(function(resp) {
             document.getElementById("status1").style.color = "white";
-            document.getElementById("status1").innerText = "Hello, " + resp.name;
+            document.getElementById("status1").innerText = "Hello, " + resp.name + " (" + resp.id + ")";
             document.getElementById("status2").style.color = "green";
-            document.getElementById("status2").innerText = "Your access token is: " + hello('google').getAuthResponse().access_token;
+            document.getElementById("status2").innerText = "Your " + network + " access token is: " + hello(network).getAuthResponse().access_token;
             console.log(resp);
         });
     });
 
 
-    hello('google').login({
-        //scope: 'email,https://www.googleapis.com/auth/admin.directory.user.readonly,phone,profile,https://www.googleapis.com/auth/user.phonenumbers.read'
-        scope: 'email'
-    });
 
 
 });

@@ -18,7 +18,7 @@ Consider the following applications scenarios:
 
 
 ## Running a demo
-The current demo works only with Google as provider and only performs encryption.
+The current demo supports Google and Facebook as providers and only performs encryption.
 
 ### Install the required packages
 The demo has been tested using `node v16.20.2`.
@@ -39,7 +39,7 @@ npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
 
-### Get a Google access token
+### Get a Google (or Facebook) access token
 You first need to run a webserver on the port `5000`, for instance:
 ```bash
 cd web
@@ -54,7 +54,7 @@ Then open the link ``localhost:5000`` in your browser, and click on ``Get access
 
 Copy the so obtained ``access token`` in your clipboard. Note that it has a validity of 1hour. We assume henceforth that the variable ``access_token`` contains the text you previously copied to your clipboard.
 In this example I computed the token for my email ``vinciovino@gmail.com``.
-
+You can select `facebook` from the menu to get a `facebook` access token.  In the case of facebook the users will be associated to the email addresses specified in their personal profiles.
 
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
@@ -99,7 +99,7 @@ node get_token.js -A access_token -t 2 -n 3 -l 2 http://localhost:8002 3 http://
 Do not forget to repalce ``access_token``  with the value computed before (see above).
 The argument `-A` specifies the `access_token`. The arguments `-t` and `-n` first correspond to the aforementioned values `t=2,n=3`. The argument `-l` specifies a list `2 http://localhost:8002` and `3 http://localhost:8003` to denote that we want to request the `token shares` from the nodes with indices `2` and `3`.
 If you want to do the request e.g. to the nodes `1,3` you would need to replace `-l 2 http://localhost:8002 3 http://localhost:8003` with `-l 1 http://localhost:8001 3 http://localhost:8003`.
-Here, we request a `token` for the current month. Use the option `-m month.year` to get a `token` for a past month. The value `month` in the string `month.year` is an integer between 0 and 11 and `year` has the form `XXXX`. Moreover, use the option `-g` if you want a `token` for a group.
+Here, we request a `token` for the current month. Use the option `-m month.year` to get a `token` for a past month. The value `month` in the string `month.year` is an integer between 0 and 11 and `year` has the form `XXXX`. Moreover, use the option `-g` if you want a `token` for a group. Use the option `-P provider` to switch to a different provider (e.g., `facebook`); the default provider is `google`.
 
 You will get an output like: 
 ```bash
