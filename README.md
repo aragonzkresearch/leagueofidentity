@@ -18,7 +18,7 @@ Consider the following applications scenarios:
 
 
 ## Running a demo
-The current demo supports Google and Facebook as providers and only performs encryption.
+The current demo only offers encryption and supports the following providers: `google` and `facebook`.
 
 ### Install the required packages
 The demo has been tested using `node v16.20.2`.
@@ -39,6 +39,9 @@ npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
 
+### Prerequisites
+It is strongly suggested that you create a Google developer account and get your `client id` (see below). However, you will be able to run all the following commands even without that.
+Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
 ### Get a Google (or Facebook) access token
 You first need to run a webserver on the port `5000`, for instance:
 ```bash
@@ -46,7 +49,7 @@ cd web
 python3 -m http.server 5000
 ```
 
-This is because the `main.js` file that implements the webpage embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` .
+This is because the `main.js` file that implements the webpage embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook.
 Then open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
