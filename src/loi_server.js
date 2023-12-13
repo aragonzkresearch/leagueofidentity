@@ -3,7 +3,7 @@
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
 const FACEBOOK_CLIENT_ID = "377291984666448";
-const FACEBOOK_SECRET_ID = "017c8e38a5677910096634717fd2a87e";
+const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK_SECRET_ID
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
