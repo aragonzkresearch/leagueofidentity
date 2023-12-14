@@ -11,6 +11,10 @@ const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
+const {
+    Console
+} = require('console');
+const fs = require('fs');
 
 commander
     .version('1.0.0', '-v, --version')
@@ -22,6 +26,8 @@ commander
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-g, --group', 'request a group token.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-ok, --output_key <value>', 'write the master public key to the file <value> instead of writing it to stdout.')
+    .option('-ot, --output_token <value>', 'write the token to the file <value> instead of writing it to stdout.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -36,6 +42,20 @@ if (options.list.length != options.threshold * 2) {
         error: true
     });
     return;
+}
+var LogMPK, LogTok;
+try {
+    LogMPK = new Console({
+        stdout: options.output_key ? fs.createWriteStream(options.output_key) : process.stdout,
+        stderr: process.stderr,
+    });
+    LogTok = new Console({
+        stdout: options.output_token ? fs.createWriteStream(options.output_token) : process.stdout,
+        stderr: process.stderr,
+    });
+} catch (err) {
+    console.error(err);
+    process.exit(1);
 }
 var Indices = [];
 var Addresses = [];
@@ -92,7 +112,7 @@ try {
             } else {
                 response.text().then(function(text) {
                     //console.log("Value received by server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + "): " + text);
-                    console.log("Value received by server " + Indices[i] + " (" + Addresses[i] + "): " + text);
+                    console.log("DEBUG: Value received by server " + Indices[i] + " (" + Addresses[i] + "): " + text);
                     //if (!email) email = text.split('..')[2];
                     if (!email) email = Buffer.from(utils.hexToBytes(text.split('..')[2])).toString('utf8');
                     //else if (text.split('..')[2] != email) throw ("Inconsistent values received from different servers");
@@ -160,7 +180,12 @@ function Finalize() {
     }
     const mpk = tmp;
     const token = tmp2;
-    console.log("reconstructed master public key: " + mpk.toHex());
+    if (!options.output_key) console.log("reconstructed master public key: " + mpk.toHex());
+    else {
+
+        console.log("DEBUG: master public key written to file " + options.output_key);
+        LogMPK.log(mpk.toHex());
+    }
     const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year;
     const msg = hashes.utf8ToBytes(id);
     const h = bls.bls12_381.G1.hashToCurve(msg);
@@ -170,6 +195,10 @@ function Finalize() {
         console.error("Verification of reconstructed token: failure.");
         process.exit(1);
     }
-    console.log("reconstructed token: " + token.toHex() + " for identity " + id);
-    console.log("Verification of reconstructed token: success.");
+    if (!options.output_token) console.log("reconstructed token: " + token.toHex() + " for identity " + id);
+    else {
+        console.log("DEBUG: token written to file " + options.output_token);
+        LogTok.log(token.toHex());
+    }
+    console.log("DEBUG: Verification of reconstructed token: success.");
 }
