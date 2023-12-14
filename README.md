@@ -116,8 +116,8 @@ reconstructed token: af5c3a2d675f8750ea1a416c8064c912ccd46e935e16b31a1906532a1ab
 Verification of reconstructed token: success.
 ```
 
-Henceforth we will denote by `MPK` the so computed `master public key`.
-So, in the following commands whenever we will write e.g., `MPK` you need to replace it with the previous value. Similarly, for the `token`.
+Henceforth we will denote by `mpk` the so computed `master public key`.
+So, in the following commands whenever we will write e.g., `mpk` you need to replace it with the previous value. Similarly, for the string `token`.
 
 ### Encrypt
 Let us assume that the secret message to encrypt is the string ``aa`` and it is contained in the file `msg`.
