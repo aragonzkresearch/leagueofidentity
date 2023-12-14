@@ -21,13 +21,13 @@ commander
     .requiredOption('-l, --list <value...>', 'list of t values of the form i_1 server_1:port_1 ... i_t server_t:port_t, where t is the given threshold specified by the -t argument and each index i_1, ..., i_t is an integer between 1 and n, where n is the value specified by the -n argument.')
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-g, --group', 'request a group token.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .parse(process.argv);
 
 const options = commander.opts();
 var provider;
-if (options.provider && options.provider !== "google" && options.provider !== "facebook") {
-    console.error("Supported providers: google, facebook.");
+if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone") {
+    console.error("Supported providers: google, facebook, google.phone.");
     process.exit(1);
 } else if (!options.provider) provider = "google";
 else provider = options.provider;
@@ -51,6 +51,11 @@ for (let i = 0; i < options.threshold; i++) {
     Addresses[i] = options.list[i * 2 + 1];
 }
 const group = !options.group ? "0" : "1";
+if (group === "1" && provider !== "google") {
+    console.error("Option -g is only compatible with provider \"google\".");
+    process.exit(1);
+
+}
 const Month = !options.month ? "now" : options.month; // Month is "now" or a string of the form month.year with month between 0 and 11 and year of the form XXXX
 var flag = 1;
 var email, Provider, month, year;
@@ -153,10 +158,11 @@ function Finalize() {
         tmp = tmp.add(pk[Q[i]]);
         tmp2 = tmp2.add(hash[Q[i]]);
     }
-    var mpk = tmp;
-    var token = tmp2;
+    const mpk = tmp;
+    const token = tmp2;
     console.log("reconstructed master public key: " + mpk.toHex());
-    const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year);
+    const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year;
+    const msg = hashes.utf8ToBytes(id);
     const h = bls.bls12_381.G1.hashToCurve(msg);
     const t1 = bls.bls12_381.pairing(h, mpk);
     const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
@@ -164,6 +170,6 @@ function Finalize() {
         console.error("Verification of reconstructed token: failure.");
         process.exit(1);
     }
-    console.log("reconstructed token: " + token.toHex());
+    console.log("reconstructed token: " + token.toHex() + " for identity " + id);
     console.log("Verification of reconstructed token: success.");
 }

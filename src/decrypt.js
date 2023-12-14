@@ -16,16 +16,16 @@ commander
     .usage('-T <value> -k <value> -e <value> -m <value> -c <value> [OPTIONS]')
     .requiredOption('-T, --token <value>', 'the token.')
     .requiredOption('-k, --key <value>', 'the master public key.')
-    .requiredOption('-e, --email <value>', 'email or domain. This value can also be a user id depending on the provider.')
+    .requiredOption('-e, --email <value>', 'email. This value may also be a domain when used in combination with tokens obtained by get_token.js with the -g option or may also be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .parse(process.argv);
 
 const options = commander.opts();
 var provider;
-if (options.provider && options.provider !== "google" && options.provider !== "facebook") {
-    console.error("Supported providers: google, facebook.");
+if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone") {
+    console.error("Supported providers: google, facebook, google.phone.");
     process.exit(1);
 } else if (!options.provider) provider = "google";
 else provider = options.provider;

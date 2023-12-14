@@ -18,7 +18,7 @@ Consider the following applications scenarios:
 
 
 ## Running a demo
-The current demo only offers encryption and supports the following providers: `google` and `facebook`.
+The current demo only offers encryption and supports the following providers: `google`, `facebook`, and `google_phone`. The latter uses google as provider but associates to the users their profile phone number (when it is visible) rathar than their email address.
 
 ### Install the required packages
 The demo has been tested using `node v16.20.2`.
@@ -42,6 +42,7 @@ Note that for `noble-curves` we stick to the version `1.2.0` we used for the tes
 ### Prerequisites
 It is strongly suggested that you create a Google developer account and get your `client id` (see below). However, you will be able to run all the following commands even without that.
 Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
+Similarly, for `google_phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 ### Get a Google (or Facebook) access token
 You first need to run a webserver on the port `5000`, for instance:
 ```bash
@@ -142,6 +143,8 @@ You should get in the end the recovered message contained in the file ``msg``.
 
 ### Group encryption/decryption
 For group encryption/decryption just specify the domain (e.g., `@oldcrypto.com`) instead of a full email. Also, recall that you need a `token` for groups (see above).
+### Phone number encryption
+With the provider `google_phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
 ## TODOs
 * Add signatures as described in the original paper.
 * Implement CCA2-secure encryption.
