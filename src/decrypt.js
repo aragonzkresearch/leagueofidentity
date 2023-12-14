@@ -10,6 +10,10 @@ const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
+const {
+    Console
+} = require('console');
+const fs = require('fs');
 
 commander
     .version('1.0.0', '-v, --version')
@@ -20,6 +24,7 @@ commander
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-om, --output_msg <value>', 'write the decrypted message to the file <value> instead of writing it to the stdout.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -29,6 +34,16 @@ if (options.provider && options.provider !== "google" && options.provider !== "f
     process.exit(1);
 } else if (!options.provider) provider = "google";
 else provider = options.provider;
+var Log;
+try {
+    Log = new Console({
+        stdout: options.output_msg ? fs.createWriteStream(options.output_msg) : process.stdout,
+        stderr: process.stderr,
+    });
+} catch (err) {
+    console.error(err);
+    process.exit(1);
+}
 
 const month = options.month.split('.')[0];
 const year = options.month.split('.')[1];
@@ -46,17 +61,22 @@ const h = bls.bls12_381.G1.hashToCurve(id);
 const t1 = bls.bls12_381.pairing(h, mpk);
 const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
 if (bls.bls12_381.fields.Fp12.eql(t1, t2) == false) {
-    console.log("Verification of token: failure.");
-    return;
+    console.error("Verification of token: failure.");
+    process.exit(1);
 }
-console.log("Verification of token: success.");
+console.log("DEBUG: Verification of token: success.");
 const g_id = bls.bls12_381.pairing(token, A);
 var B_computed = bls.bls12_381.fields.Fp12.toBytes(g_id);
 
 const B_expanded = hkdf.hkdf(sha256.sha256, B_computed, undefined, 'application', length);
 B_computed = hashes.bytesToHex(B_expanded);
 var decoder = new TextDecoder();
-console.log(decoder.decode(utils.hexToBytes(xor(B_computed, B))));
+if (!options.output_msg) console.log("decrypted message: " + decoder.decode(utils.hexToBytes(xor(B_computed, B))));
+else {
+
+    console.log("DEBUG: decrypted message written to file " + options.output_msg);
+    Log.log(decoder.decode(utils.hexToBytes(xor(B_computed, B))));
+}
 
 function xor(hex1, hex2) {
     const buf1 = Buffer.from(hex1, 'hex');

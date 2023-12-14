@@ -34,9 +34,9 @@ hello.init({
 document.getElementById("accountbutton").addEventListener("click", async () => {
     var network = document.getElementById("menu").value;
     const options = (network === "google") ? {
-        scope: 'email'
+        scope: 'email, https://www.googleapis.com/auth/user.phonenumbers.read'
     } : {
-        scope: 'email, public_profile'
+        scope: 'email, user_friends, public_profile'
     };
 
 

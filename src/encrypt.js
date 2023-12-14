@@ -11,7 +11,10 @@ const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
-
+const {
+    Console
+} = require('console');
+const fs = require('fs');
 commander
     .version('1.0.0', '-v, --version')
     .usage('-k <value> -e <value> -m <value> [OPTIONS]')
@@ -19,6 +22,7 @@ commander
     .requiredOption('-e, --email <value>', 'email. This value may be a domain when used in combination with tokens obtained by get_token.js with the -g option or may be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-oc, --output_ciphertext <value>', 'write the ciphertext to the file <value> instead of writing it to the stdout.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -33,7 +37,16 @@ const month = options.month.split('.')[0];
 const year = options.month.split('.')[1];
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const email = options.email;
-
+var Log;
+try {
+    Log = new Console({
+        stdout: options.output_ciphertext ? fs.createWriteStream(options.output_ciphertext) : process.stdout,
+        stderr: process.stderr,
+    });
+} catch (err) {
+    console.error(err);
+    process.exit(1);
+}
 
 const randtmp = bls.bls12_381.utils.randomPrivateKey();
 const derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randtmp
@@ -53,7 +66,11 @@ read(process.stdin).then(function(msg) {
     const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
     msg = hashes.bytesToHex(msg);
     B = xor(hashes.bytesToHex(B_expanded), msg);
-    console.log("ciphertext: " + length + "." + A.toHex() + "." + B);
+    if (!options.output_ciphertext) console.log("ciphertext: " + length + "." + A.toHex() + "." + B);
+    else {
+        console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
+        Log.log(length + "." + A.toHex() + "." + B);
+    }
 });
 
 function xor(hex1, hex2) {
