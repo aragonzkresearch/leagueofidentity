@@ -18,7 +18,7 @@ Consider the following applications scenarios:
 
 
 ## Running a demo
-The current demo only offers encryption and supports the following providers: `google`, `facebook`, and `google_phone`. The latter uses google as provider but associates to the users their profile phone number (when it is visible) rathar than their email address.
+The current demo only offers encryption and supports the following providers: `google`, `facebook`, and `google_phone`. The latter uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses.
 
 ### Install the required packages
 The demo has been tested using `node v16.20.2`.
