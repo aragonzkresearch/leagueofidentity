@@ -32,11 +32,7 @@ commander
 
 const options = commander.opts();
 var provider;
-if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone") {
-    console.error("Supported providers: google, facebook, google.phone.");
-    process.exit(1);
-} else if (!options.provider) provider = "google";
-else provider = options.provider;
+provider = loi_utils.handleProviders(options, provider);
 if (options.list.length != options.threshold * 2) {
     commander.help({
         error: true

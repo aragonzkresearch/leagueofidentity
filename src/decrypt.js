@@ -10,6 +10,7 @@ const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
+const loi_utils = require("./utils");
 const {
     Console
 } = require('console');
@@ -29,11 +30,7 @@ commander
 
 const options = commander.opts();
 var provider;
-if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone") {
-    console.error("Supported providers: google, facebook, google.phone.");
-    process.exit(1);
-} else if (!options.provider) provider = "google";
-else provider = options.provider;
+provider = loi_utils.handleProviders(options, provider);
 var Log;
 try {
     Log = new Console({
@@ -71,16 +68,9 @@ var B_computed = bls.bls12_381.fields.Fp12.toBytes(g_id);
 const B_expanded = hkdf.hkdf(sha256.sha256, B_computed, undefined, 'application', length);
 B_computed = hashes.bytesToHex(B_expanded);
 var decoder = new TextDecoder();
-if (!options.output_msg) console.log("decrypted message: " + decoder.decode(utils.hexToBytes(xor(B_computed, B))));
+if (!options.output_msg) console.log("decrypted message: " + decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B))));
 else {
 
     console.log("DEBUG: decrypted message written to file " + options.output_msg);
-    Log.log(decoder.decode(utils.hexToBytes(xor(B_computed, B))));
-}
-
-function xor(hex1, hex2) {
-    const buf1 = Buffer.from(hex1, 'hex');
-    const buf2 = Buffer.from(hex2, 'hex');
-    const bufResult = buf1.map((b, i) => b ^ buf2[i]);
-    return bufResult.toString('hex');
+    Log.log(decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B))));
 }
