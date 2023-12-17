@@ -147,8 +147,9 @@ You should get in the end the recovered message contained in the file ``msg``.
 For group encryption/decryption just specify the domain (e.g., `@oldcrypto.com`) instead of a full email. Also, recall that you need a `token` for groups (see above).
 ### Phone number encryption (`phencryption`)
 With the provider `google_phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
+### Signatures
+The commands `node sign.js` and `node verify.js` allow resp. to sign and verify signatures. We defer the programs' interface to the help provided by the `--help` option.
 ## TODOs
-* Add signatures as described in the original paper.
 * Implement CCA2-secure encryption.
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
 * Digital identity cards.

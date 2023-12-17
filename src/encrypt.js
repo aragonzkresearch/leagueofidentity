@@ -1,5 +1,5 @@
 // usage:
-// node encrypt.js -k mpk -e email (or domain) -m month.year 
+// node encrypt.js -k mpk -e email (or domain/phone) -m month.year  [OPTIONS]
 // the message is taken from the stdin
 
 const bls = require('@noble/curves/bls12-381');
@@ -56,21 +56,16 @@ const h = bls.bls12_381.G1.hashToCurve(id);
 const g_id = bls.bls12_381.pairing(h, mpk_to_s);
 var B = bls.bls12_381.fields.Fp12.toBytes(g_id);
 
-read(process.stdin).then(function(msg) {
+loi_utils.read(process.stdin).then(function(msg) {
     msg = hashes.utf8ToBytes(msg);
     var length = msg.length;
     const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
     msg = hashes.bytesToHex(msg);
     B = loi_utils.xor(hashes.bytesToHex(B_expanded), msg);
-    if (!options.output_ciphertext) console.log("ciphertext: " + length + "." + A.toHex() + "." + B);
-    else {
-        console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
-        Log.log(length + "." + A.toHex() + "." + B);
-    }
-});
-
-async function read(stream) {
-    const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
-    return Buffer.concat(chunks).toString('utf8');
+    const ciphertext = length + "." + A.toHex() + "." + B);
+if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
+else {
+    console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
+    Log.log(length + "." + ciphertext);
 }
+});

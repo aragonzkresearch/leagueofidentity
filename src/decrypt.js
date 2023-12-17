@@ -1,5 +1,5 @@
 // usage:
-// node decrypt.js -T token -k mpk -e email (or domain) -m month.year -c ciphertext
+// node decrypt.js -T token -k mpk -e email (or domain/phone) -m month.year -c ciphertext
 
 const bls = require('@noble/curves/bls12-381');
 const hkdf = require("@noble/hashes/hkdf");
@@ -47,7 +47,6 @@ const year = options.month.split('.')[1];
 const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const email = options.email;
-const ciphertext = options.ciphertext;
 const A = bls.bls12_381.G2.ProjectivePoint.fromHex(ciphertext.split('.')[1]);
 const B = ciphertext.split('.')[2];
 const length = parseInt(ciphertext.split('.')[0]);
