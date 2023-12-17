@@ -16,6 +16,7 @@ Consider the following applications scenarios:
 * `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town. 
 * `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
 
+We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time and satisfying these two properties together is usually more challenging.
 
 ## Running a demo
 The current demo only offers encryption and supports the following providers: `google`, `facebook`, and `google_phone`. The latter uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses.
