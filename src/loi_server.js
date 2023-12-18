@@ -2,9 +2,11 @@
 // node server.js -p port -s share 
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
-const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
+//const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
 const FACEBOOK_CLIENT_ID = "377291984666448";
-const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK SECRET ID
+//const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK SECRET ID
+const FACEBOOK_SECRET_ID = "017c8e38a5677910096634717fd2a87e";
+const GOOGLE_API_KEY = "AIzaSyBqocloBYO2vfatpC-RJ4-YMvU7fBNqgvQ"; // fill it with your GOOGLE API KEY
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
@@ -57,7 +59,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
                     if (req.params.date !== "now") {
                         year = req.params.date.split('.')[1];
                         month = req.params.date.split('.')[0];
-                        if (year > curyear || month > curmonth || req.params.group !== "0") {
+                        if (year > curyear || month > curmonth) {
                             console.error("Invalid token request received by client.");
                             res.sendStatus(400);
                             return;
@@ -74,7 +76,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
                                 return;
 
                             }
-                            console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov);
+                            console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov + " and group flag: " + req.params.group);
                             var st = ComputeTokenShare(text2.email, options.share, month, year, req.params.group, req.params.prov, req.params.opts);
                             res.send(st);
                         }).catch((err) => {
@@ -102,7 +104,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
             console.error("Invalid token request received by client.");
             return;
         });
-    else if (req.params.prov === "facebook" && req.params.opts != "null")
+    else if (req.params.prov === "facebook" && req.params.opts !== "null")
         fetch('https://graph.facebook.com/v18.0/debug_token?input_token=' + req.params.token + '&access_token=' + FACEBOOK_CLIENT_ID + '|' + FACEBOOK_SECRET_ID)
         .then(function(response) {
             if (!response.ok) {
@@ -125,7 +127,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
                     if (req.params.date !== "now") {
                         year = req.params.date.split('.')[1];
                         month = req.params.date.split('.')[0];
-                        if (year > curyear || month > curmonth || req.params.group !== "0") {
+                        if (year > curyear || month > curmonth) {
                             console.error("Invalid token request received by client.");
                             res.sendStatus(400);
                             return;
@@ -150,7 +152,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
                                         return;
 
                                     }
-                                    console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov + " with option " + req.params.opts);
+                                    console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov + " with option " + req.params.opts + " and group flag: " + req.params.group);
                                     var st = ComputeTokenShare(text2.email, options.share, month, year, req.params.group, req.params.prov, req.params.opts);
                                     res.send(st);
                                 }).catch((err) => {
@@ -188,7 +190,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
             console.error("Invalid token request received by client.");
             return;
         });
-    else if (req.params.prov === "google.phone")
+    else if (req.params.prov === "google.phone" && req.params.group !== "0")
         fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + req.params.token)
         .then(function(response) {
             if (!response.ok) {
@@ -289,7 +291,7 @@ app.get('/:prov/:group/:date/:token/:opts', async (req, res) => {
                         month = curmonth;
                     }
 
-                    console.log("Received request for email: " + text.email + " for provider: " + req.params.prov);
+                    console.log("Received request for email: " + text.email + " for provider: " + req.params.prov + " and group flag: " + req.params.group);
                     var st = ComputeTokenShare(text.email, options.share, month, year, req.params.group, req.params.prov, req.params.opts);
                     res.send(st);
                 } else {
