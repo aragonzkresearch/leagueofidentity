@@ -152,6 +152,12 @@ The commands `node sign.js` and `node verify.js` allow resp. to sign and verify 
 For group encryption/signatures  specify the `--group` option to the `get_token.js` command and specify the domain (e.g., `oldcrypto.com`) instead of a full email in the other commands.
 ### Anti-spam token
 With the `facebook` token you can specify the option `--friends X` (to all commands) to associate the token only to Facebook users with at least `X` number of friends. This may have applications as anti-spam tool in blockchains since it makes harder to create fake users.
+### Anonymity 
+With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
+For security the servers should check if this token has not been already used but this is not done in the current demo.
+
+This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
+
 ## TODOs
 * Implement CCA2-secure encryption.
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
