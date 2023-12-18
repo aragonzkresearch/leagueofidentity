@@ -11,6 +11,7 @@ const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
+const loi_utils = require("./utils");
 const {
     Console
 } = require('console');
