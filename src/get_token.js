@@ -29,7 +29,8 @@ commander
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .option('-ok, --output_key <value>', 'write the master public key to the file <value> instead of writing it to stdout.')
     .option('-ot, --output_token <value>', 'write the token to the file <value> instead of writing it to stdout.')
-    .option('-f, --friends <value>', 'gran the token only to users with <value> total counts of friends.')
+    .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
+    .option('-anon, --anonymous', 'Use the access token AT specified to the argument -A as identity in order to achieve anonymity. You will need to specify the argument \'-e AT\' to all other commands and \'-e AT@domain\' when the the access token is obtained by using this command with the option \'-anon\' in combination with \'-g\'.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -92,12 +93,13 @@ if (provider !== "facebook" && options.friends) {
     console.error("Option --friends compatibile only with provider \"facebook\"");
     process.exit(1);
 }
-const fetch_opts = loi_utils.handleOptions(options, provider);
+const fetch_friends = loi_utils.handleOptionFriends(options, provider);
+const fetch_anon = loi_utils.handleOptionAnon(options, provider);
 try {
     for (let i = 0; i < options.threshold; i++) {
         Q[i] = BigInt(Indices[i]);
 
-        fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token + "/" + fetch_opts).then(function(response) {
+        fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token + "/" + fetch_friends + "/" + fetch_anon).then(function(response) {
             if (!response.ok) {
                 console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " response status: " + response.status + ". Try later.");
                 process.exit(1);
@@ -179,7 +181,8 @@ function Finalize() {
         console.log("DEBUG: master public key written to file " + options.output_key);
         LogMPK.log(mpk.toHex());
     }
-    const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_opts;
+    const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends;
+    console.log(email);
     const msg = hashes.utf8ToBytes(id);
     const h = bls.bls12_381.G1.hashToCurve(msg);
     const t1 = bls.bls12_381.pairing(h, mpk);

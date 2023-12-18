@@ -14,11 +14,24 @@ function handleProviders(options, provider) {
     return provider;
 }
 
-function handleOptions(options, provider) {
+function handleOptionFriends(options, provider) {
     var opts;
     if (provider === "facebook" && options.friends) opts = options.friends;
     else opts = "null";
     return opts;
+}
+
+function handleOptionAnon(options, provider) {
+    var opts;
+    if (provider !== "google.phone" && options.anonymous) opts = "1";
+    else opts = "0";
+    return opts;
+}
+
+async function read(stream) {
+    const chunks = [];
+    for await (const chunk of stream) chunks.push(chunk);
+    return Buffer.concat(chunks).toString('utf8');
 }
 async function read(stream) {
     const chunks = [];
@@ -29,6 +42,7 @@ async function read(stream) {
 module.exports = {
     xor,
     handleProviders,
-    handleOptions,
+    handleOptionFriends,
+    handleOptionAnon,
     read
 };

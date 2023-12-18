@@ -24,7 +24,7 @@ commander
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .option('-oc, --output_ciphertext <value>', 'write the ciphertext to the file <value> instead of writing it to the stdout.')
-    .option('-f, --friends <value>', 'gran the token only to users with <value> total counts of friends.')
+    .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -44,7 +44,8 @@ try {
     console.error(err);
     process.exit(1);
 }
-const fetch_opts = loi_utils.handleOptions(options, provider);
+const fetch_friends = loi_utils.handleOptionFriends(options, provider);
+const fetch_anon = loi_utils.handleOptionAnon(options, provider);
 
 const randtmp = bls.bls12_381.utils.randomPrivateKey();
 const derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randtmp
@@ -53,7 +54,7 @@ const s = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
 const A = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(s);
 const mpk_to_s = mpk.multiply(s);
 
-const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_opts);
+const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
 const h = bls.bls12_381.G1.hashToCurve(id);
 const g_id = bls.bls12_381.pairing(h, mpk_to_s);
 var B = bls.bls12_381.fields.Fp12.toBytes(g_id);
@@ -65,9 +66,9 @@ loi_utils.read(process.stdin).then(function(msg) {
     msg = hashes.bytesToHex(msg);
     B = loi_utils.xor(hashes.bytesToHex(B_expanded), msg);
     const ciphertext = length + "." + A.toHex() + "." + B;
-if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
-else {
-    console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
-    Log.log(ciphertext);
-}
+    if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
+    else {
+        console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
+        Log.log(ciphertext);
+    }
 });
