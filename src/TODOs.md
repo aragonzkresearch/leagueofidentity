@@ -1,4 +1,5 @@
 # TODOs
+* offer access tokens themselves as replacement to email/phone in order to achieve anonymity 
 * Error handling
 * Parsing of emails, phone numbers...
 * Compatibility of options
