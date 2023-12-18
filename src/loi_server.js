@@ -1,5 +1,5 @@
 // usage:
-// node server.js -p port -s share
+// node server.js -p port -s share 
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
 const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
@@ -20,7 +20,7 @@ const commander = require('commander');
 
 commander
     .version('1.0.0', '-v, --version')
-    .usage('-p <value> -s <value> [OPTIONS]')
+    .usage('-p <value> -s <value>')
     .requiredOption('-p, --port <value>', 'port on which to listen.')
     .requiredOption('-s, --share <value>', 'share of the master secret key.')
     .parse(process.argv);
@@ -44,8 +44,8 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
             }
             response.json().then(function(text) {
                 if (!text.data || !text.data.app_id || text.data.app_id != FACEBOOK_CLIENT_ID) {
-                    res.sendStatus(400);
                     console.error("Token request with invalid client id.");
+                    res.sendStatus(400);
                     return;
 
                 }
@@ -58,8 +58,8 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                         year = req.params.date.split('.')[1];
                         month = req.params.date.split('.')[0];
                         if (year > curyear || month > curmonth || req.params.group !== "0") {
-                            res.sendStatus(400);
                             console.error("Invalid token request received by client.");
+                            res.sendStatus(400);
                             return;
                         }
                     } else {
@@ -69,15 +69,19 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                     fetch('https://graph.facebook.com/v18.0/me?fields=email&access_token=' + req.params.token).then(function(response2) {
                         response2.json().then(function(text2) {
                             if (!text2.email) {
-                                res.sendStatus(400);
                                 console.error("Invalid token request received by client.");
+                                res.sendStatus(400);
                                 return;
 
                             }
-                            console.log("Received request for email: " + text2.email);
+                            console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov);
                             var st = ComputeTokenShare(text2.email, options.share, month, year, req.params.group, req.params.prov);
                             res.send(st);
                         });
+                    }).catch((err) => {
+                        res.sendStatus(400);
+                        console.error("Invalid token request received by client.");
+                        return;
                     });
                 } else {
                     res.sendStatus(400);
@@ -86,7 +90,13 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                 }
             }).catch(function(err) {
                 res.sendStatus(400);
+                console.error("Invalid token request received by client.");
+                return;
             });
+        }).catch(function(err) {
+            res.sendStatus(400);
+            console.error("Invalid token request received by client.");
+            return;
         });
     else if (req.params.prov === "google.phone")
         fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + req.params.token)
@@ -127,10 +137,18 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                             return;
                         }
                         response2.json().then(function(text2) {
-                            console.log("Received request for phone number: " + text2.phoneNumbers[0].canonicalForm);
+                            console.log("Received request for phone number: " + text2.phoneNumbers[0].canonicalForm + " for provider: " + req.params.prov);
                             var st = ComputeTokenShare(text2.phoneNumbers[0].canonicalForm, options.share, month, year, req.params.group, req.params.prov);
                             res.send(st);
+                        }).catch(function(err) {
+                            res.sendStatus(400);
+                            console.error("Invalid token request received by client.");
+                            return;
                         });
+                    }).catch(function(err) {
+                        res.sendStatus(400);
+                        console.error("Invalid token request received by client.");
+                        return;
                     });
                 } else {
                     res.sendStatus(400);
@@ -139,7 +157,13 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                 }
             }).catch(function(err) {
                 res.sendStatus(400);
+                console.error("Invalid token request received by client.");
+                return;
             });
+        }).catch(function(err) {
+            res.sendStatus(400);
+            console.error("Invalid token request received by client.");
+            return;
         });
 
     else if (req.params.prov === "google")
@@ -175,7 +199,7 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                         month = curmonth;
                     }
 
-                    console.log("Received request for email: " + text.email);
+                    console.log("Received request for email: " + text.email + " for provider: " + req.params.prov);
                     var st = ComputeTokenShare(text.email, options.share, month, year, req.params.group, req.params.prov);
                     res.send(st);
                 } else {
@@ -185,7 +209,13 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
                 }
             }).catch(function(err) {
                 res.sendStatus(400);
+                console.error("Invalid token request received by client.");
+                return;
             });
+        }).catch(function(err) {
+            res.sendStatus(400);
+            console.error("Invalid token request received by client.");
+            return;
         });
     else {
         console.error("Error. Request for unsupported or unkown provider.");
@@ -196,7 +226,7 @@ app.get('/:prov/:group/:date/:token', async (req, res) => {
 
 function ComputeTokenShare(email, share, month, year, group, provider) {
     try {
-        console.log("token share to transmit to client:" + share);
+        console.log("token share to transmit to client: " + share);
         var share_decoded = utils.bytesToNumberBE(utils.hexToBytes(share));
         pk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(share_decoded);
         if (group === "1") email = email.split('@')[1];

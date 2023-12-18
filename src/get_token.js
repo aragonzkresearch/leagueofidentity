@@ -51,7 +51,7 @@ try {
         stderr: process.stderr,
     });
 } catch (err) {
-    console.error(err);
+    console.error(err.message);
     process.exit(1);
 }
 var Indices = [];
@@ -81,38 +81,25 @@ var hash = [];
 var Q = [];
 var lambda = [];
 var date_path;
-//if (process.argv[5 + 2 * process.argv[3]] !== "now") {
 if (Month !== "now") {
-    // date_path = process.argv[5 + 2 * process.argv[3]];
-    // month = process.argv[5 + 2 * process.argv[3]].split('.')[0];
-    // year = process.argv[5 + 2 * process.argv[3]].split('.')[1];
     date_path = Month;
     month = Month.split('.')[0];
     year = Month.split('.')[1];
 } else date_path = "now";
-//var t = process.argv[3];
 var t = options.threshold;
-//var group = process.argv[6 + 2 * process.argv[3]];
 try {
-    //for (let i = 0; i < process.argv[3]; i++) {
     for (let i = 0; i < options.threshold; i++) {
-        //Q[i] = BigInt(process.argv[5 + 2 * i]);
         Q[i] = BigInt(Indices[i]);
 
-        //fetch(process.argv[6 + 2 * i] + "/" + group + "/" + date_path + "/" + process.argv[2]).then(function(response) {
         fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
             if (!response.ok) {
-                //console.error("Server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + ")" + " response status: " + response.status + ". Try later");
                 console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " response status: " + response.status + ". Try later.");
                 process.exit(1);
 
             } else {
                 response.text().then(function(text) {
-                    //console.log("Value received by server " + process.argv[5 + 2 * i] + " (" + process.argv[6 + 2 * i] + "): " + text);
                     console.log("DEBUG: Value received by server " + Indices[i] + " (" + Addresses[i] + "): " + text);
-                    //if (!email) email = text.split('..')[2];
                     if (!email) email = Buffer.from(utils.hexToBytes(text.split('..')[2])).toString('utf8');
-                    //else if (text.split('..')[2] != email) throw ("Inconsistent values received from different servers");
                     else if (Buffer.from(utils.hexToBytes(text.split('..')[2])).toString('utf8') != email) throw ("Inconsistent values received from different servers");
                     if (!month) {
                         month = text.split('..')[3];
@@ -127,17 +114,20 @@ try {
                     t--;
                     if (t == 0) Finalize();
                 }).catch(function(err) {
-                    console.error(err);
+                    console.error(err.message);
                 });
             }
 
+        }).catch((err) => {
+            console.error(err.message);
+            process.exit(1);
         });
 
     }
 
 } catch (err) {
 
-    console.error(err);
+    console.error(err.message);
     process.exit(1);
 }
 
