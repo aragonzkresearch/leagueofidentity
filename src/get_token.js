@@ -69,8 +69,8 @@ for (let i = 0; i < options.threshold; i++) {
     Addresses[i] = options.list[i * 2 + 1];
 }
 const group = !options.group ? "0" : "1";
-if (group === "1" && provider !== "google") {
-    console.error("Option -g is only compatible with provider \"google\".");
+if (group === "1" && provider === "google.phone") {
+    console.error("Option -g is not compatible with provider \"google.phone\".");
     process.exit(1);
 
 }
