@@ -14,6 +14,12 @@ function handleProviders(options, provider) {
     return provider;
 }
 
+function handleOptions(options, provider) {
+    var opts;
+    if (provider === "facebook" && options.friends) opts = options.friends;
+    else opts = "null";
+    return opts;
+}
 async function read(stream) {
     const chunks = [];
     for await (const chunk of stream) chunks.push(chunk);
@@ -23,5 +29,6 @@ async function read(stream) {
 module.exports = {
     xor,
     handleProviders,
+    handleOptions,
     read
 };

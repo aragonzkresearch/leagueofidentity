@@ -150,6 +150,8 @@ For group encryption/decryption just specify the domain (e.g., `@oldcrypto.com`)
 With the provider `google_phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
 ### Signatures
 The commands `node sign.js` and `node verify.js` allow resp. to sign and verify signatures. We defer the programs' interface to the help provided by the `--help` option.
+### Anti-spam token
+With the `facebook` token you can specify the option `--friends X` (to all commands) to associate the token only to Facebook users with at least `X` number of friends. This may have applications as anti-spam tool in blockchains since it makes harder to create fake users.
 ## TODOs
 * Implement CCA2-secure encryption.
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).

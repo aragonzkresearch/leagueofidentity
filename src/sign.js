@@ -26,6 +26,7 @@ commander
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .option('-os, --output_signature <value>', 'write the signature to the file <value> instead of writing it to the stdout.')
+    .option('-f, --friends <value>', 'gran the token only to users with <value> total counts of friends.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -41,6 +42,7 @@ try {
     console.error(err);
     process.exit(1);
 }
+const fetch_opts = loi_utils.handleOptions(options, provider);
 
 const month = options.month.split('.')[0];
 const year = options.month.split('.')[1];
@@ -56,7 +58,7 @@ loi_utils.read(process.stdin).then(function(msg) {
     const fp = mod.Field(bls.bls12_381.params.r);
     const r = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
     const C = mpk.multiply(r);
-    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year);
+    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_opts);
     const h = bls.bls12_381.G1.hashToCurve(id);
     const E = bls.bls12_381.G1.ProjectivePoint.BASE.multiply(r);
     const F = token.multiply(r);

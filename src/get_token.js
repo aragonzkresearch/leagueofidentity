@@ -29,6 +29,7 @@ commander
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
     .option('-ok, --output_key <value>', 'write the master public key to the file <value> instead of writing it to stdout.')
     .option('-ot, --output_token <value>', 'write the token to the file <value> instead of writing it to stdout.')
+    .option('-f, --friends <value>', 'gran the token only to users with <value> total counts of friends.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -87,11 +88,16 @@ if (Month !== "now") {
     year = Month.split('.')[1];
 } else date_path = "now";
 var t = options.threshold;
+if (provider !== "facebook" && options.friends) {
+    console.error("Option --friends compatibile only with provider \"facebook\"");
+    process.exit(1);
+}
+const fetch_opts = loi_utils.handleOptions(options, provider);
 try {
     for (let i = 0; i < options.threshold; i++) {
         Q[i] = BigInt(Indices[i]);
 
-        fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token).then(function(response) {
+        fetch(Addresses[i] + "/" + provider + "/" + group + "/" + date_path + "/" + options.access_token + "/" + fetch_opts).then(function(response) {
             if (!response.ok) {
                 console.error("Server " + Indices[i] + " (" + Addresses[i] + ")" + " response status: " + response.status + ". Try later.");
                 process.exit(1);
@@ -173,7 +179,7 @@ function Finalize() {
         console.log("DEBUG: master public key written to file " + options.output_key);
         LogMPK.log(mpk.toHex());
     }
-    const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year;
+    const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_opts;
     const msg = hashes.utf8ToBytes(id);
     const h = bls.bls12_381.G1.hashToCurve(msg);
     const t1 = bls.bls12_381.pairing(h, mpk);

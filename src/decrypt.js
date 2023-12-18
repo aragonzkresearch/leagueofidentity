@@ -25,6 +25,7 @@ commander
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-f, --friends <value>', 'gran the token only to users with <value> total counts of friends.')
     .option('-om, --output_msg <value>', 'write the decrypted message to the file <value> instead of writing it to the stdout.')
     .parse(process.argv);
 
@@ -41,18 +42,19 @@ try {
     console.error(err);
     process.exit(1);
 }
-
+const fetch_opts = loi_utils.handleOptions(options, provider);
 const month = options.month.split('.')[0];
 const year = options.month.split('.')[1];
 const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const email = options.email;
+const ciphertext = options.ciphertext;
 const A = bls.bls12_381.G2.ProjectivePoint.fromHex(ciphertext.split('.')[1]);
 const B = ciphertext.split('.')[2];
 const length = parseInt(ciphertext.split('.')[0]);
 
 
-const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year);
+const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_opts);
 const h = bls.bls12_381.G1.hashToCurve(id);
 const t1 = bls.bls12_381.pairing(h, mpk);
 const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
