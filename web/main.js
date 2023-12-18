@@ -36,7 +36,8 @@ document.getElementById("accountbutton").addEventListener("click", async () => {
     const options = (network === "google") ? {
         scope: 'email, https://www.googleapis.com/auth/user.phonenumbers.read'
     } : {
-        scope: 'email, user_friends, public_profile, user_likes'
+        // scope: 'email, user_friends, public_profile, user_likes'
+        scope: 'email, user_friends, public_profile'
     };
 
 
