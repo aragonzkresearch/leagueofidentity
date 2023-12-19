@@ -1,7 +1,10 @@
 // usage:
 // node server.js -p port -s share 
 
-// NOTE: in a real world implementation, when req.params.anon==="1" to a fetch request the server should check if the access token req.params.token has been previously issued and reject it in that case. This is not done in the current demo.
+// NOTE: in a real world implementation, when req.params.anon==="1" in a fetch request the server should check
+// whether the access token req.params.token has been previously issued and the user the access token refers to
+// already received a valid crypto token in the same timeframe and reject the request in that case. 
+// This is not done in the current demo.
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
 const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
