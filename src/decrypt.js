@@ -30,28 +30,24 @@ commander
     .option('-cca2, --cca2', 'decrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security. The first byte of the decrypted message will be 0/1 to denote failure or success of decryption.')
     .parse(process.argv);
 
-const options = commander.opts();
-var provider;
-provider = loi_utils.handleProviders(options, provider);
-var Log;
 try {
+    const options = commander.opts();
+    var provider;
+    provider = loi_utils.handleProviders(options, provider);
+    var Log;
     Log = new Console({
         stdout: options.output_msg ? fs.createWriteStream(options.output_msg) : process.stdout,
         stderr: process.stderr,
     });
-} catch (err) {
-    console.error(err);
-    process.exit(1);
-}
-const fetch_friends = loi_utils.handleOptionFriends(options, provider);
-const fetch_anon = loi_utils.handleOptionAnon(options, provider);
-const month = options.month.split('.')[0];
-const year = options.month.split('.')[1];
-const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
-const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
-const email = options.email;
-const ciphertext = options.ciphertext;
-try {
+
+    const fetch_friends = loi_utils.handleOptionFriends(options, provider);
+    const fetch_anon = loi_utils.handleOptionAnon(options, provider);
+    const month = options.month.split('.')[0];
+    const year = options.month.split('.')[1];
+    const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
+    const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
+    const email = options.email;
+    const ciphertext = options.ciphertext;
     if (!options.cca2) {
         const A = bls.bls12_381.G2.ProjectivePoint.fromHex(ciphertext.split('.')[1]);
         const B = ciphertext.split('.')[2];
@@ -125,6 +121,6 @@ try {
 
 } catch (err) {
 
-    console.error("Decryption error");
+    console.error("Decryption error: " + err.message);
     process.exit(1);
 }
