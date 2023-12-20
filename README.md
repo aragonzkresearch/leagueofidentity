@@ -146,6 +146,8 @@ You should get in the end the recovered message contained in the file ``msg``.
 
 ### Phone number encryption (`phencryption`)
 With the provider `google_phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
+### CCA2-security
+With the option `-cca2` to both `encrypt.js` and `decrypt.js` you can require security against adaptive chosen ciphertext attacks (`IND-CCA2`), the strongest form of security for encryption. The decrypted message will start with a byte that is either `1` or `0` depending on whether the decryption was successful or not. 
 ### Signatures
 The commands `node sign.js` and `node verify.js` allow resp. to sign and verify signatures. We defer the programs' interface to the help provided by the `--help` option.
 ### Group encryption/signatures
