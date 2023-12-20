@@ -55,7 +55,7 @@ const email = options.email;
 
 loi_utils.read(process.stdin).then(function(msg) {
     var randtmp = bls.bls12_381.utils.randomPrivateKey();
-    var derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randtmp
+    var derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randomness
     const fp = mod.Field(bls.bls12_381.params.r);
     const r = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
     const C = mpk.multiply(r);
