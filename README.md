@@ -161,7 +161,6 @@ For security the servers should check whether the access token has not been alre
 This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
 ## TODOs
-* Implement CCA2-secure encryption.
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
 * Digital identity cards.
 ## References
