@@ -182,7 +182,7 @@ function Finalize() {
         LogMPK.log(mpk.toHex());
     }
     const id = "LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends;
-    console.log(email);
+    console.log("DEBUG: token is for email: " + email);
     const msg = hashes.utf8ToBytes(id);
     const h = bls.bls12_381.G1.hashToCurve(msg);
     const t1 = bls.bls12_381.pairing(h, mpk);
