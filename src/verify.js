@@ -82,5 +82,6 @@ loi_utils.read(process.stdin).then(function(msg) {
 
         console.log("DEBUG: result written to file " + options.output_result);
         Log.log(flag);
-    }
+    } 
+    process.exit(1-flag);
 });
