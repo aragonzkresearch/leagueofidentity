@@ -7,11 +7,9 @@
 // This is not done in the current demo.
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
-//const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
+const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
 //const FACEBOOK_CLIENT_ID = "377291984666448";
-//const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK SECRET ID
-const FACEBOOK_SECRET_ID = "017c8e38a5677910096634717fd2a87e";
-const GOOGLE_API_KEY = "AIzaSyBqocloBYO2vfatpC-RJ4-YMvU7fBNqgvQ"; // fill it with your GOOGLE API KEY
+const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK SECRET ID
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
