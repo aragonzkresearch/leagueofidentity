@@ -8,7 +8,7 @@
 
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com";
 const GOOGLE_API_KEY = ""; // fill it with your GOOGLE API KEY
-//const FACEBOOK_CLIENT_ID = "377291984666448";
+const FACEBOOK_CLIENT_ID = "377291984666448";
 const FACEBOOK_SECRET_ID = ""; // fill it with your FACEBOOK SECRET ID
 const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
