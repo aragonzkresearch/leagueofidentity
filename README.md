@@ -3,12 +3,12 @@
 This repository provides a PoC implementation of the ``League of Identity `` (`LoI`)  system described in this [note](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view). 
 
 ``LoI`` is a network of nodes with the following functionalities. ``LoI`` publishes what is called a ``master public key`` (``MPK``).
-Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice can send the so obtained `access token` to a sufficiently large set of nodes of `LoI` requesting to these nodes a cryptographich ``token`` corresponding to her email address and a given month and such set of nodes, upon verifying that the ``access token`` is valid, send back to Alice a set of `token shares` by means of which Alice can compute the (full) `token` corresponding to her email address and the specified month.
+Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice can send the so obtained `access token` to a sufficiently large set of nodes of `LoI` requesting to these nodes a cryptographic ``token`` corresponding to her email address and a given month and such set of nodes, upon verifying that the ``access token`` is valid, send back to Alice a set of `token shares` by means of which Alice can compute the (full) `token` corresponding to her email address and the specified month.
 Bob can use the `MPK` of `LoI` to encrypt a message associated to `alice@gmail.com` and a given month and can publish the resulting ciphertext on a blockchain or send it directly to Alice. 
 Alice can use the previously obtained `token` to decrypt the ciphertext received by Bob and recover the secret message.
 We remark that the `token` is different from the `access token`. 
 
-Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Bussiness domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
+Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Business domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
 
 Moreover, the token can be used by Alice to sign transactions over blockchains (e.g. `Cosmos` ones) so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
 Consider the following applications scenarios:
@@ -27,7 +27,7 @@ You can switch to such version using the command:
 ```bash
 nvm install 16.20.2
 ```
-For the web part the only required package is `hello.js` but a standalone version is embedded in the `web` folder.
+For the web part the only required package is `hello.js` but a stand-alone version is embedded in the `web` folder.
 For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
@@ -47,13 +47,13 @@ It is strongly suggested that you create a Google developer account and get your
 Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
 Similarly, for `google_phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 ### Get a Google (or Facebook) access token
-You first need to run a webserver on the port `5000`, for instance:
+You first need to run a web server on the port `5000`, for instance:
 ```bash
 cd web
 python3 -m http.server 5000
 ```
 
-This is because the `main.js` file that implements the webpage embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook.
+This is because the `main.js` file that implements the web page embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook.
 Then open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
@@ -103,7 +103,7 @@ Now you can run the following:
 ```bash
 node get_token.js -A access_token -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003
 ```
-Do not forget to repalce ``access_token``  with the value computed before (see above).
+Do not forget to replace ``access_token``  with the value computed before (see above).
 The argument `-A` specifies the `access_token`. The arguments `-t` and `-n` first correspond to the aforementioned values `t=2,n=3`. The argument `-l` specifies a list `2 http://localhost:8002` and `3 http://localhost:8003` to denote that we want to request the `token shares` from the nodes with indices `2` and `3`.
 If you want to do the request e.g. to the nodes `1,3` you would need to replace `-l 2 http://localhost:8002 3 http://localhost:8003` with `-l 1 http://localhost:8001 3 http://localhost:8003`.
 Here, we request a `token` for the current month. Use the option `-m month.year` to get a `token` for a past month. The value `month` in the string `month.year` is an integer between 0 and 11 and `year` has the form `XXXX`. Moreover, use the option `--group` if you want a `token` for a group. Use the option `-P provider` to switch to a different provider (e.g., `facebook`); the default provider is `google`.
