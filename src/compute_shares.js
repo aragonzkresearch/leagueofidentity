@@ -72,9 +72,9 @@ function ComputeLagrangeCoefficients(lambda, t, Q) {
 var Q = [];
 var lambda = [];
 for (i = 0n; i < options.threshold; i++) Q[i] = i + 1n;
-Q[0] = 1n;
-Q[1] = 2n;
-Q[2] = 4n;
+//Q[0] = 1n;
+//Q[1] = 2n;
+//Q[2] = 4n;
 ComputeLagrangeCoefficients(lambda, options.threshold, Q);
 const sk = [];
 const pk = [];
