@@ -45,7 +45,7 @@ Note that for `noble-curves` we stick to the version `1.2.0` we used for the tes
 ### Prerequisites
 It is strongly suggested that you create a Google developer account and get your `client id` (see below). However, you will be able to run all the following commands even without that.
 Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
-Similarly, for `google_phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
+Similarly, for `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 ### Get a Google (or Facebook) access token
 You first need to run a web server on the port `5000`, for instance:
 ```bash
