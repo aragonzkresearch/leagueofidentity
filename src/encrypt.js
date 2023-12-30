@@ -23,7 +23,7 @@ commander
     .requiredOption('-k, --key <value>', 'the master public key.')
     .requiredOption('-e, --email <value>', 'email. This value may be a domain when used in combination with tokens obtained by get_token.js with the -g option or may be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-oc, --output_ciphertext <value>', 'write the ciphertext to the file <value> instead of writing it to the stdout.')
     .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
     .option('-cca2, --cca2', 'encrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security.')
@@ -53,7 +53,7 @@ try {
         const A = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(s);
         const mpk_to_s = mpk.multiply(s);
 
-        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
         const h = bls.bls12_381.G1.hashToCurve(id);
         const g_id = bls.bls12_381.pairing(h, mpk_to_s);
         var B = bls.bls12_381.fields.Fp12.toBytes(g_id);
@@ -83,7 +83,7 @@ try {
             const s = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
             const A = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(s);
             const mpk_to_s = mpk.multiply(s);
-            const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+            const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
             const h = bls.bls12_381.G1.hashToCurve(id);
             const g_id = bls.bls12_381.pairing(h, mpk_to_s);
             var B = bls.bls12_381.fields.Fp12.toBytes(g_id);

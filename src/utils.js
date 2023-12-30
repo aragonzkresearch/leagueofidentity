@@ -6,7 +6,7 @@ function xor(hex1, hex2) {
 }
 
 function handleProviders(options, provider) {
-    if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone") {
+    if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone" && options.provider !== 'dic.it') {
         console.error("Supported providers: google, facebook, google.phone.");
         process.exit(1);
     } else if (!options.provider) provider = "google";
@@ -39,10 +39,21 @@ async function read(stream) {
     return Buffer.concat(chunks).toString('utf8');
 }
 
+function prov_is_dic(provider) {
+    if (provider.split('.')[0] === 'dic' && provider.split('.')[1] === 'it') return true;
+    else return false;
+}
+
+function dic_country(provider) {
+    return provider.split('.')[1];
+}
+
 module.exports = {
     xor,
     handleProviders,
     handleOptionFriends,
     handleOptionAnon,
-    read
+    read,
+    prov_is_dic,
+    dic_country,
 };

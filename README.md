@@ -15,11 +15,13 @@ Consider the following applications scenarios:
 * The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`.
 * `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town or the DAO of < 18 years old teenagers. 
 * `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
+* `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO memembers.
+* `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the admins of the page can create a bridge between Facebook and web3 applications.
 
 We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them.
 
 ## Running a demo
-The current demo only offers encryption and supports the following providers: `google`, `facebook`, and `google_phone`. The latter uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses.
+The current demo only offers encryption and supports the following providers: `google`, `facebook, google.phone` and `dic.it`. The provider `google.phone` uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. The provider `dic.it` is for Italian digital identity cards (tested on v3.0).
 
 ### Install the required packages
 The demo has been tested using `node v16.20.2`.
@@ -119,6 +121,7 @@ Verification of reconstructed token: success.
 
 Henceforth we will denote by `mpk` the so computed `master public key`.
 So, in the following commands whenever we will write e.g., `mpk` you need to replace it with the previous value. Similarly, for the string `token`.
+Note that the reconstructed `mpk` computed by the previous command is just used for debug purposes. In real applications one should use as master public key the one that is made public by the `LoI` members at the launch of the system.
 
 ### Encrypt
 Let us assume that the secret message to encrypt is the string ``aa`` and it is contained in the file `msg`.
@@ -160,8 +163,48 @@ For security the servers should check whether the access token has not been alre
 
 This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
+### Digital Identity Cards
+The flow to use digital identity cards (`DICs`) is the following. The following is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will go to adopt it).
+With the following command:
+
+```bash
+node get_token.js  -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -j challenge.json 
+```
+one gets from the `LoI` server (in this case with indices `2` and `3`) a `challenge` file `challenge.json`. Observe that we specify `null` as parameter to `-A` since no `access token` is actually needed for `DIC`s.
+The file `challenge.json` contains some challenges with corresponding generation time. The user is asked to sign this file with his/her own `DIC` within 30mins. In real world applications this file could be replaced by a contract to be signed with the user's `DIC` as done in many public administrations websites.
+
+Let us say that the user signs this file with his/her own `DIC` (this depends on the specific country, in Italy it can be done with the official App `CIEID` even though other Apps are available as well) and let us assume that the signed file is `challenge.json-signed.p7m`. Note that `.p7m` is the usual standard for signed files.
+Then the user submits the following command:
+```bash
+node get_token.js   -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -s challenge-signed.p7m
+```
+and gets something like:
+```bash
+DEBUG: the server 2 accepted the signed document.
+LoI..dic.it..XXXXXXXXXXXXXXXXXXXX..11..2023..a498c6a0508adbfe812475fbee2da1230fc2068dfd4d07e438ba59f7307cb637b87ff30a3b16a1bc3996c4ac202f2ad304247e020d293fb42f71f5e0c8e14dd5c8a8da925397cba2262453f85b83e3947f6fd3a6c8f937461a728712b4603414..a72d41f75297ff2f735e34051fd643a2a6a3d06a8918406e8c0ef61b89127447182e3366652d5dc590bf2a9b3a0f8152..null..0
+DEBUG: the server 3 accepted the signed document.
+LoI..dic.it..XXXXXXXXXXXXXXXXXXXX..11..2023..aa653eeeb7ec24a296a67980efd5b069013e3a1df79c879126036e7cf88932d4c32a85088e5a856d618744f2d2e7b42c0e31e25b7581ca10aee77cd0a4d80a039b868e71c730571441d8478b112f317cb79a6a7f06157550c4d7fa559f57681c..84072d75fea0b315407c6c32d68d0e2428184bad56302cc5f920a33b34139b0c27aec13cdd5962d8ff4374788f3f0503..null..0
+reconstructed master public key: 88b8aa62727da6ab4a10d077a4e5cfe038695925f037db5b7c91efa824d1b7ad80056083077e592f00142ac6abf208d30e4b962b94e2fc8c759a7c6faab7b2f8718b3a8cb156da061176ddeaefb13a6c3568a9614608bddc67f982a1d710d28e
+DEBUG: token is for email: XXXXXXXXXXXXXXXXXXXX
+reconstructed token: a412949c279d85583f1a7918e3883e41378562f3127b0d915bd720ddf2f64df72ced2be7941c34409d6c96ce81fb1821 for identity LoI..dic.it..XXXXXXXXXXXXXXXXXXXX..11..2023..null..0
+DEBUG: Verification of reconstructed token: success.
+```
+In the previous output, for privacy reasons, I replaced my own Social Security Number (`SSN`) that corresponds to the `codice fiscale` in Italy with the value `XXX....X`.
+One can also issue the same command with the option `-anon` to get a token for the `identifier` corresponding to the social security number. The difference is that the `SSN` may usually (one example is in Italy)  contain private information. For example in Italy the `SSN` exposes your birth date and birth place.
+The `identifier` obtained throug the `-anon` option instead should be known only to government and institutions so it is somehow `more anonymous`.
+
+Once you get the token you can issue the commands `encrypt.js, decrypt.js, sign.js, verify.js` with respect to such token specifying as parameter to the option `--email` the `SSN` or the `identifier` (depending on whether the token was issues without or with the option `-anon`).
+
+
+To generalize the functionality to `DIC` issued by other countries the modifications should be the following.
+For the Italian `DIC` there is a folder `dic/it` containing the Italian `local issuer certificates`, that is the certificates under which the certificate of an owner of an Italian `DIC` is signed.
+For other countries you would just need to create separate folders containing the right `local issuer` certificates of the country to support. Moreover, the Italian certificate provides in the field `commonName` a string of the form `X/Y` where `X` is the user's `SSN` and `Y` is the `identifier` of such `SSN`. Each country may have different standards. 
+For example the Italian `DIC` provides in the `serialNumber` field the `identifier` of the `DIC` itself (that is, your identity card number) that can be alternatively used as identifier.
+
+Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
+### Generalizing the
+
 ## TODOs
 * Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
-* Digital identity cards.
 ## References
 Vincenzo Iovino, Aragon ZK Research. [League of Identity: distributed identity-based encryption and authentication from Google and other providers](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view), 2023.

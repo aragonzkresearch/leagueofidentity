@@ -24,7 +24,7 @@ commander
     .requiredOption('-k, --key <value>', 'the master public key.')
     .requiredOption('-e, --email <value>', 'email. This value may also be a domain when used in combination with tokens obtained by get_token.js with the -g option or may also be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-os, --output_signature <value>', 'write the signature to the file <value> instead of writing it to the stdout.')
     .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
     .parse(process.argv);
@@ -59,7 +59,7 @@ loi_utils.read(process.stdin).then(function(msg) {
     const fp = mod.Field(bls.bls12_381.params.r);
     const r = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
     const C = mpk.multiply(r);
-    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
     const h = bls.bls12_381.G1.hashToCurve(id);
     const E = bls.bls12_381.G1.ProjectivePoint.BASE.multiply(r);
     const F = token.multiply(r);

@@ -22,12 +22,17 @@ const app = express();
 const nocache = require('nocache');
 const cors = require('cors');
 const commander = require('commander');
-
+const fs = require('fs');
+const dic = require('./dic/loi_server_dic');
+const loi_utils = require("./utils");
+const bodyParser = require('body-parser');
+const shell = require('shelljs');
 commander
     .version('1.0.0', '-v, --version')
     .usage('-p <value> -s <value>')
     .requiredOption('-p, --port <value>', 'port on which to listen.')
     .requiredOption('-s, --share <value>', 'share of the master secret key.')
+    .requiredOption('-i, --index <value>', 'index of the server. This option is necessary to deal with digital identity cards (DICs) authentication.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -37,6 +42,9 @@ app.listen(options.port, () => {
     console.log('listening on port ' + options.port);
 });
 
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 
 app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
     if (req.params.prov === "facebook" && req.params.friends === "null")
@@ -323,6 +331,7 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
             res.sendStatus(400);
             return;
         });
+    else if (loi_utils.prov_is_dic(req.params.prov)) dic.loi_server_dic(options.index, req, res);
     else {
         console.error("Error. Request for unsupported or unkown provider.");
         res.sendStatus(400);
@@ -336,12 +345,86 @@ function ComputeTokenShare(email, share, month, year, group, provider, fetch_fri
         var share_decoded = utils.bytesToNumberBE(utils.hexToBytes(share));
         pk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(share_decoded);
         if (group === "1" && anon === "0") email = email.split('@')[1];
-        const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+        const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + anon);
         var hash = bls.bls12_381.G1.hashToCurve(msg);
         hash = hash.multiply(share_decoded);
-        return "LoI.." + provider + ".." + Buffer.from(email, 'utf8').toString('hex') + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex() + ".." + fetch_friends;
+        return "LoI.." + provider + ".." + Buffer.from(email, 'utf8').toString('hex') + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex() + ".." + fetch_friends + ".." + anon;
     } catch (err) {
 
         console.error(err);
     }
 }
+
+app.use(bodyParser.raw({
+    "type": "application/octet-stream"
+}));
+
+var counter = 0;
+app.post('/dic/:date/:country/:anon', function(req, res) {
+
+    try {
+        const tmpfilename = "./dic/" + req.params.country + "/tmp." + options.index + "." + counter++;
+        const stream = fs.createWriteStream(tmpfilename);
+        console.log("Received document written to file: " + tmpfilename);
+        stream.once('open', function(fd) {
+            stream.write(req.body);
+            stream.end();
+            console.log("Document is signed by SSN:");
+            const SSN = shell.exec("./dic/" + req.params.country + "/verify.sh " + tmpfilename + " " + tmpfilename + ".challenge", {
+                async: false
+            }).stdout;
+            console.log("\n");
+            fs.readFile(tmpfilename + ".challenge", function(error, content) {
+                if (error) {
+                    res.send("ERROR");
+                    return;
+                }
+
+                const data = JSON.parse(content);
+                var flag = 0;
+                for (let i = 0; i < data.Challenges.length; i++) {
+                    if (dic.dic_map.get(data.Challenges[i].Challenge) === true && Math.floor(Date.now() / 1000) - data.Challenges[i].Challenge.split('.')[2] <= dic.TIMEOUT_CHALLENGE) {
+                        flag = 1;
+                    }
+                }
+
+                if (flag === 0) {
+                    console.log("error");
+                    res.send("ERROR");
+                    return;
+
+                }
+
+
+                var year, month, curyear, curmnonth;
+                const date = new Date();
+                curyear = date.getFullYear();
+                curmonth = date.getMonth();
+                if (req.params.date !== "now") {
+                    year = req.params.date.split('.')[1];
+                    month = req.params.date.split('.')[0];
+                    if (year > curyear || month > curmonth) {
+                        console.error("Invalid token request received by client.");
+                        res.sendStatus(400);
+                        return;
+                    }
+                } else {
+                    year = curyear;
+                    month = curmonth;
+                }
+                var st;
+                if (!req.params.anon || req.params.anon === "0") st = ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
+                else st = ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
+                console.log("DEBUG: sending " + st);
+                res.send(st);
+
+
+            });
+        });
+
+
+    } catch (err) {
+        console.error(err);
+    }
+
+});

@@ -24,7 +24,7 @@ commander
     .requiredOption('-e, --email <value>', 'email. This value may also be a domain when used in combination with tokens obtained by get_token.js with the -g option or may also be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-s, --signature <value>', 'the signature.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-or, --output_result <value>', 'write the result (\"0\" or \"1\") to the file <value> instead of writing it to the stdout.')
     .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
     .parse(process.argv);
@@ -56,7 +56,7 @@ const F = bls.bls12_381.G1.ProjectivePoint.fromHex(signature.split('.')[2]);
 const pi_A = bls.bls12_381.G1.ProjectivePoint.fromHex(signature.split('.')[3]);
 const pi_z = utils.hexToNumber(signature.split('.')[4]);
 loi_utils.read(process.stdin).then(function(msg) {
-    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+    const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
     const h = bls.bls12_381.G1.hashToCurve(id);
     var flag = 1;
     var t1 = bls.bls12_381.pairing(h, C);
@@ -82,6 +82,6 @@ loi_utils.read(process.stdin).then(function(msg) {
 
         console.log("DEBUG: result written to file " + options.output_result);
         Log.log(flag);
-    } 
-    process.exit(1-flag);
+    }
+    process.exit(1 - flag);
 });

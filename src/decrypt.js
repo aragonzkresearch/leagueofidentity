@@ -24,7 +24,7 @@ commander
     .requiredOption('-e, --email <value>', 'email. This value may also be a domain when used in combination with tokens obtained by get_token.js with the -g option or may also be a phone number for \"google.phone\" provider.')
     .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
     .option('-om, --output_msg <value>', 'write the decrypted message to the file <value> instead of writing it to the stdout.')
     .option('-cca2, --cca2', 'decrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security. The first byte of the decrypted message will be 0/1 to denote failure or success of decryption.')
@@ -54,7 +54,7 @@ try {
         const length = parseInt(ciphertext.split('.')[0]);
 
 
-        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
         const h = bls.bls12_381.G1.hashToCurve(id);
         const t1 = bls.bls12_381.pairing(h, mpk);
         const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
@@ -83,7 +83,7 @@ try {
         const C = ciphertext.split('.')[3];
 
 
-        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends);
+        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
         const h = bls.bls12_381.G1.hashToCurve(id);
         const t1 = bls.bls12_381.pairing(h, mpk);
         const t2 = bls.bls12_381.pairing(token, bls.bls12_381.G2.ProjectivePoint.BASE);
