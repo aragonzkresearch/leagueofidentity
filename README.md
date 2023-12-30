@@ -47,7 +47,7 @@ Note that for `noble-curves` we stick to the version `1.2.0` we used for the tes
 ### Prerequisites
 It is strongly suggested that you create a Google developer account and get your `client id` (see below). However, you will be able to run all the following commands even without that.
 Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
-Similarly, for `google_phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
+Similarly, for `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 ### Get a Google (or Facebook) access token
 You first need to run a web server on the port `5000`, for instance:
 ```bash
@@ -148,7 +148,7 @@ aa
 You should get in the end the recovered message contained in the file ``msg``.
 
 ### Phone number encryption (`phencryption`)
-With the provider `google_phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
+With the provider `google.phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
 ### CCA2-security
 With the option `-cca2` to both `encrypt.js` and `decrypt.js` you can require security against adaptive chosen ciphertext attacks (`IND-CCA2`), the strongest form of security for encryption. The decrypted message will start with a character that is either `1` or `0` depending on whether the decryption was successful or not. 
 ### Signatures
@@ -202,9 +202,6 @@ For other countries you would just need to create separate folders containing th
 For example the Italian `DIC` provides in the `serialNumber` field the `identifier` of the `DIC` itself (that is, your identity card number) that can be alternatively used as identifier.
 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
-### Generalizing the
 
-## TODOs
-* Additional providers with social features (e.g., tokens for Instagram/Twitter users with at least `X` followers).
 ## References
 Vincenzo Iovino, Aragon ZK Research. [League of Identity: distributed identity-based encryption and authentication from Google and other providers](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view), 2023.
