@@ -176,7 +176,7 @@ The file `challenge.json` contains some challenges with corresponding generation
 Let us say that the user signs this file with his/her own `DIC` (this depends on the specific country, in Italy it can be done with the official App `CIEID` even though other Apps are available as well) and let us assume that the signed file is `challenge.json-signed.p7m`. Note that `.p7m` is the usual standard for signed files.
 Then the user submits the following command:
 ```bash
-node get_token.js   -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -s challenge-signed.p7m
+node get_token.js   -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -s challenge.json-signed.p7m
 ```
 and gets something like:
 ```bash
@@ -190,8 +190,7 @@ reconstructed token: a412949c279d85583f1a7918e3883e41378562f3127b0d915bd720ddf2f
 DEBUG: Verification of reconstructed token: success.
 ```
 In the previous output, for privacy reasons, I replaced my own Social Security Number (`SSN`) that corresponds to the `codice fiscale` in Italy with the value `XXX....X`.
-One can also issue the same command with the option `-anon` to get a token for the `identifier` corresponding to the social security number. The difference is that the `SSN` may usually (one example is in Italy)  contain private information. For example in Italy the `SSN` exposes your birth date and birth place.
-The `identifier` obtained throug the `-anon` option instead should be known only to government and institutions so it is somehow `more anonymous`.
+One can also issue the same command with the option `-anon` to get a token for the `identifier` corresponding to the `SSN`. The difference is that the `SSN` may usually contain private information. For example in Italy the `SSN` exposes your birth date and birth place and some characters of your name. Indeed, the Italian `SSN` is a deterministic function of name, surname, birth date, birth place and you can get the `SSN` of any Italian citizen if you know such data. Instead, the `identifier` obtained through the `-anon` option should be only known to governmental entities so it is somehow `more anonymous`.
 
 Once you get the token you can issue the commands `encrypt.js, decrypt.js, sign.js, verify.js` with respect to such token specifying as parameter to the option `--email` the `SSN` or the `identifier` (depending on whether the token was issues without or with the option `-anon`).
 
