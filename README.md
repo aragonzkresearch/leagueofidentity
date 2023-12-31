@@ -205,6 +205,10 @@ For other countries you would just need to create separate folders containing th
 For example the Italian `DIC` provides in the `serialNumber` field the `identifier` of the `DIC` itself (that is, your identity card number) that can be alternatively used as identifier.
 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
+#### About creating the DAO of the citizens of a given town or province
+Unfortunately, `DICs` do not usually contain info like the Town of residency of the citizen.
+However, a `DIC` does often store another certificate signed with the citizen's certificate that in turn does contain additional information like the town, street, etc. of residency of the citizen.
+Therefore, it should be possible to extend the current demo to have the user to send this additional certificate in order to get a token corresponding e.g. to a given town.
 
 ## References
 Vincenzo Iovino, Aragon ZK Research. [League of Identity: distributed identity-based encryption and authentication from Google and other providers](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view), 2023.
