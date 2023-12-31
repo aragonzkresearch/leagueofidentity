@@ -8,16 +8,17 @@ The token can be used for the following functionalities.
 ### Functionality of the `LoI` token
 * Encryption. Bob can use the `MPK` of `LoI` to encrypt a message associated to `alice@gmail.com` and a given month and can publish the resulting ciphertext on a blockchain or send it directly to Alice. 
 Alice can use the previously obtained `token` to decrypt the ciphertext received by Bob and recover the secret message.
-We remark that the `token` is different from the `access token`. 
-** Group encryption. Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Business domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
+We remark that the `token` is different from the `access token`.
+	- Group encryption. Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Business domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
 * Signatures. The token can be used by Alice to sign transactions over blockchains (e.g. `Cosmos` ones) so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
 Consider the following applications scenarios:
-** The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`. 
-** `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town or the DAO of < 18 years old teenagers. 
-** `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
-** `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO memembers.
-** `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the admins of the page can create a bridge between Facebook and web3 applications.
-** Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verification on Ethereum of such signatures consumes too much GAS to be practical. On the other hands, the `LoI` tokens for digital identity cards produce signatures that are efficiently verifiable in Ethereum and other blockchains.
+	- The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`. 
+	- `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town or the DAO of < 18 years old teenagers. 
+	- `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
+	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO memembers.
+
+- `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the admins of the page can create a bridge between Facebook and web3 applications.
+- Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verification on Ethereum of such signatures consumes too much GAS to be practical. On the other hands, the `LoI` tokens for digital identity cards produce signatures that are efficiently verifiable in Ethereum and other blockchains.
 
 We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them.
 
