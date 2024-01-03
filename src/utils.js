@@ -48,11 +48,25 @@ function dic_country(provider) {
     return provider.split('.')[1];
 }
 
+function getMonth(options) {
+    if (options.month) return options.month.split('.')[0];
+    const date = new Date();
+    return date.getMonth();
+}
+
+function getYear(options) {
+    if (options.month) return options.month.split('.')[1];
+    const date = new Date();
+    return date.getFullYear();
+}
+
 module.exports = {
     xor,
     handleProviders,
     handleOptionFriends,
     handleOptionAnon,
+    getMonth,
+    getYear,
     read,
     prov_is_dic,
     dic_country,

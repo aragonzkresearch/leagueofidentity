@@ -22,7 +22,7 @@ commander
     .usage('-k <value> -e <value> -m <value> [OPTIONS]')
     .requiredOption('-k, --key <value>', 'the master public key.')
     .requiredOption('-e, --email <value>', 'email. This value may be a domain when used in combination with tokens obtained by get_token.js with the -g option or may be a phone number for \"google.phone\" provider.')
-    .requiredOption('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
+    .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-oc, --output_ciphertext <value>', 'write the ciphertext to the file <value> instead of writing it to the stdout.')
     .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
@@ -33,8 +33,10 @@ try {
     const options = commander.opts();
     var provider;
     provider = loi_utils.handleProviders(options, provider);
-    const month = options.month.split('.')[0];
-    const year = options.month.split('.')[1];
+    const month = loi_utils.getMonth(options);
+    const year = loi_utils.getYear(options);
+    //const month = options.month.split('.')[0];
+    //const year = options.month.split('.')[1];
     const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
     const email = options.email;
     var Log;
