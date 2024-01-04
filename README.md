@@ -204,7 +204,7 @@ Once you get the token you can issue the commands `encrypt.js, decrypt.js, sign.
 To generalize the functionality to `DIC` issued by other countries the modifications should be the following.
 For the Italian `DIC` there is a folder `dic/it` containing the Italian `local issuer certificates`, that is the certificates under which the certificate of an owner of an Italian `DIC` is signed.
 For other countries you would just need to create separate folders containing the right `local issuer` certificates of the country to support. Moreover, the Italian certificate provides in the field `commonName` a string of the form `X/Y` where `X` is the user's `SSN` and `Y` is the `identifier` of such `SSN`. Each country may have different standards. 
-For example the Italian `DIC` provides in the `serialNumber` field the `identifier` of the `DIC` itself (that is, your identity card number) that can be alternatively used as identifier.
+For example the Italian `DIC` provides in the `serialNumber` field the identity number of the `DIC` itself that can be alternatively used as identity information.
 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
 #### About creating the DAO of the citizens of a given town or province
