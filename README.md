@@ -34,7 +34,7 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a stand-alone version is embedded in the `web` folder.
-For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
@@ -44,6 +44,8 @@ npm install --save cors
 npm install --save commander
 npm install --save console
 npm install --save fs
+npm install --save shelljs
+npm install --save body-parser
 npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
