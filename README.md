@@ -170,16 +170,16 @@ For security the servers should check whether the access token has not been alre
 This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
 ### Digital Identity Cards
-The flow to use digital identity cards (`DICs`) is the following. The following is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will go to adopt it).
-With the following command:
+The flow to use digital identity cards (`DICs`) is the following. The following example is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will adopt it).
+With the command:
 
 ```bash
 node get_token.js  -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -j challenge.json 
 ```
-one gets from the `LoI` server (in this case with indices `2` and `3`) a `challenge` file `challenge.json`. Observe that we specify `null` as parameter to `-A` since no `access token` is actually needed for `DIC`s.
-The file `challenge.json` contains some challenges with corresponding generation time. The user is asked to sign this file with his/her own `DIC` within 30mins. In real world applications this file could be replaced by a contract to be signed with the user's `DIC` as done in many public administrations websites.
+one gets from the chosen `LoI` nodes (in this case the ones with indices `2` and `3`) a `challenge` file `challenge.json`. Observe that we specify `null` as parameter to `-A` since no `access token` is actually needed for `DICs`.
+The file `challenge.json` contains some random challenges with corresponding generation times. The user is asked to sign this file with his/her own `DIC` within 30mins. In real world applications this file could be replaced by a contract in PDF form to be signed with the user's `DIC` as it is the case in many public administrations websites.
 
-Let us say that the user signs this file with his/her own `DIC` (this depends on the specific country, in Italy it can be done with the official App `CIEID` even though other Apps are available as well) and let us assume that the signed file is `challenge.json-signed.p7m`. Note that `.p7m` is the usual standard for signed files.
+Let us say that the user signs the aforementioned file with his/her own `DIC` (this depends on the specific country, in Italy it can be done with the official App `CIEID` even though other Apps are available as well) and let us assume that the signed file is `challenge.json-signed.p7m`. Note that `.p7m` is the usual standard for signed files.
 Then the user submits the following command:
 ```bash
 node get_token.js   -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003  -A null -P dic.it -s challenge.json-signed.p7m
@@ -195,7 +195,7 @@ DEBUG: token is for email: XXXXXXXXXXXXXXXXXXXX
 reconstructed token: a412949c279d85583f1a7918e3883e41378562f3127b0d915bd720ddf2f64df72ced2be7941c34409d6c96ce81fb1821 for identity LoI..dic.it..XXXXXXXXXXXXXXXXXXXX..11..2023..null..0
 DEBUG: Verification of reconstructed token: success.
 ```
-In the previous output, for privacy reasons, I replaced my own Social Security Number (`SSN`) that corresponds to the `codice fiscale` in Italy with the value `XXX....X`.
+In the previous output, for privacy reasons, I replaced my own Social Security Number (`SSN`) that corresponds to the Italian `codice fiscale` with the string `XXX....X`.
 One can also issue the same command with the option `-anon` to get a token for the `identifier` corresponding to the `SSN`. The difference is that the `SSN` may usually contain private information. For example in Italy the `SSN` exposes your birth date and birth place and some characters of your name. Indeed, the Italian `SSN` is a deterministic function of name, surname, birth date, birth place and you can get the `SSN` of any Italian citizen if you know such data. Instead, the `identifier` obtained through the `-anon` option should be only known to governmental entities so it is somehow `more anonymous`.
 
 Once you get the token you can issue the commands `encrypt.js, decrypt.js, sign.js, verify.js` with respect to such token specifying as parameter to the option `--email` the `SSN` or the `identifier` (depending on whether the token was issues without or with the option `-anon`).
