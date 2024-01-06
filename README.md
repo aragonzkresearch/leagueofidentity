@@ -207,7 +207,7 @@ For other countries you would just need to create separate folders containing th
 For example the Italian `DIC` provides in the `serialNumber` field the identity number of the `DIC` itself that can be alternatively used as identity information.
 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
-#### Creating DAO of citizens younger or older than a given age.
+#### Creating DAOs of citizens younger or older than a given age
 With the option `--age <value>` it is possible to require that the token be granted only to citizens that are either born in the year `value` or after if `value` is a positive integer of the form `XX` or born in the year  `-value` if `value` is a negative integer of the form `-XX`.
 If for example we use the option `--age 90` (or `--age -90`) for a user with `SSN` (or `identifer` depending on whether the option `--anon` is not used or is used) equal to `Z` we should then specify `--email 90@Z` (or `--email -90@Z`) to the commands `encrypt, decrypt, sign, verify`. 
 Note that this option is very powerful along with the option `--anon`. Indeed, in this case the user is identifed by an `email` of the form `90@Z` (or `-90@Z`) where `Z` is somehow anonymous and notwithstanding a smart contract can differentiate the age of the user to create e.g. the DAO of citizens that are born after 1990 (or before). 
