@@ -125,7 +125,7 @@ function loi_server_post_it(options, req, res) { // for Italian DIC
 
 module.exports = {
     loi_server_dic,
-    loi_server_post_dic,
+    loi_server_post_it,
     dic_map,
     AGE_LIMIT,
     TIMEOUT_CHALLENGE,
