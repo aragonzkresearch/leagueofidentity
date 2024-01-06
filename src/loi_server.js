@@ -360,7 +360,7 @@ app.use(bodyParser.raw({
 }));
 
 var counter = 0;
-app.post('/dic/:date/:country/:anon', function(req, res) {
+app.post('/dic/:date/:country/:anon/:age', function(req, res) {
 
     try {
         const tmpfilename = "./dic/" + req.params.country + "/tmp." + options.index + "." + counter++;
@@ -405,7 +405,7 @@ app.post('/dic/:date/:country/:anon', function(req, res) {
                     month = req.params.date.split('.')[0];
                     if (year > curyear || month > curmonth) {
                         console.error("Invalid token request received by client.");
-                        res.sendStatus(400);
+                        res.send("ERROR");
                         return;
                     }
                 } else {
@@ -413,8 +413,27 @@ app.post('/dic/:date/:country/:anon', function(req, res) {
                     month = curmonth;
                 }
                 var st;
-                if (!req.params.anon || req.params.anon === "0") st = ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
-                else st = ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
+                const age = parseInt(SSN.split('/')[0].slice(6, 8));
+                var requiredAge;
+                if (req.params.age !== "null") {
+                    requiredAge = parseInt(req.params.age);
+                    if ((requiredAge < 0 && age > -requiredAge) || (requiredAge >= 0 && age < requiredAge)) {
+                        console.error("Invalid token request received by client.");
+                        res.send("ERROR");
+                        return;
+
+                    }
+                }
+
+                if (!req.params.anon || req.params.anon === "0") {
+                    if (req.params.age !== "null") st = ComputeTokenShare(requiredAge + "@" + SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
+                    else st = ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
+
+                } else {
+                    if (req.params.age !== "null") st = ComputeTokenShare(requiredAge + "@" + SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
+                    else st = ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
+                }
+
                 console.log("DEBUG: sending " + st);
                 res.send(st);
 

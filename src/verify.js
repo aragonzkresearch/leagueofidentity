@@ -26,7 +26,8 @@ commander
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
     .option('-or, --output_result <value>', 'write the result (\"0\" or \"1\") to the file <value> instead of writing it to the stdout.')
-    .option('-f, --friends <value>', 'grant the token only to users with <value> total counts of friends.')
+    .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
+    .option('-f, --friends <value>', 'for tokens granted only to users with at least <value> total counts of friends.')
     .parse(process.argv);
 
 const options = commander.opts();
