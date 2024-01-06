@@ -52,8 +52,7 @@ const year = loi_utils.getYear(options);
 //const year = options.month.split('.')[1];
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
-const email = options.email;
-
+const email = options.email; // TODO: we could reject if the email in the token is different from the one provided as input to the command.
 
 
 loi_utils.read(process.stdin).then(function(msg) {
@@ -69,7 +68,7 @@ loi_utils.read(process.stdin).then(function(msg) {
     randtmp = bls.bls12_381.utils.randomPrivateKey();
     const a = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
     const pi_A = bls.bls12_381.G1.ProjectivePoint.BASE.multiply(a);
-    const input = hashes.utf8ToBytes(E.toHex() + "." + pi_A.toHex() + "." + msg); // we hash input = statement E + first message pi_A + message msg
+    const input = hashes.utf8ToBytes(E.toHex() + "." + pi_A.toHex() + "." + msg + "." + email); // we hash input = statement E + first message pi_A + message msg + email
     derived = hkdf.hkdf(sha256.sha256, input, undefined, 'application', 48);
     const e = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r)); // e is the hash of input converted to scalar
     const pi_z = fp.add(a, fp.mul(e, r)); // pi_z = a + e*r

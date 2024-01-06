@@ -22,11 +22,10 @@ const app = express();
 const nocache = require('nocache');
 const cors = require('cors');
 const commander = require('commander');
-const fs = require('fs');
 const dic = require('./dic/loi_server_dic');
 const loi_utils = require("./utils");
+const cts = require("./compute_token_share");
 const bodyParser = require('body-parser');
-const shell = require('shelljs');
 commander
     .version('1.0.0', '-v, --version')
     .usage('-p <value> -s <value>')
@@ -91,7 +90,7 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
                             var Email = text2.email;
                             if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
                             else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text2.email.split('@')[1];
-                            const st = ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
+                            const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
                             res.send(st);
                         }).catch((err) => {
                             console.error("Invalid token request received by client.");
@@ -170,7 +169,7 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
                                     var Email = text2.email;
                                     if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
                                     else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text2.email.split('@')[1];
-                                    const st = ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
+                                    const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
                                     res.send(st);
                                 }).catch((err) => {
                                     console.error("Invalid token request received by client.");
@@ -249,7 +248,7 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
                             console.log("Received request for phone number: " + text2.phoneNumbers[0].canonicalForm + " for provider: " + req.params.prov + " and anon param: " + req.params.anon);
                             var Email = text2.phoneNumbers[0].canonicalForm;
                             if (req.params.anon === "1") Email = req.params.token;
-                            const st = ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
+                            const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
                             res.send(st);
                         }).catch(function(err) {
                             console.error("Invalid token request received by client.");
@@ -314,7 +313,7 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
                     var Email = text.email;
                     if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
                     else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text.email.split('@')[1];
-                    const st = ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
+                    const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon);
                     res.send(st);
                 } else {
                     console.error("Invalid token request received by client.");
@@ -339,111 +338,18 @@ app.get('/:prov/:group/:date/:token/:friends/:anon', async (req, res) => {
     }
 });
 
-function ComputeTokenShare(email, share, month, year, group, provider, fetch_friends, anon) {
-    try {
-        console.log("token share to transmit to client: " + share);
-        var share_decoded = utils.bytesToNumberBE(utils.hexToBytes(share));
-        pk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(share_decoded);
-        if (group === "1" && anon === "0") email = email.split('@')[1];
-        const msg = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + anon);
-        var hash = bls.bls12_381.G1.hashToCurve(msg);
-        hash = hash.multiply(share_decoded);
-        return "LoI.." + provider + ".." + Buffer.from(email, 'utf8').toString('hex') + ".." + month + ".." + year + ".." + pk.toHex() + ".." + hash.toHex() + ".." + fetch_friends + ".." + anon;
-    } catch (err) {
-
-        console.error(err);
-    }
-}
 
 app.use(bodyParser.raw({
     "type": "application/octet-stream"
 }));
 
-var counter = 0;
 app.post('/dic/:date/:country/:anon/:age', function(req, res) {
+    if (req.params.country === "it")
+        dic.loi_server_post_dic(options, req, res);
+    else {
+        console.error("Error. Request for unsupported or unkown provider.");
+        res.sendStatus(400);
 
-    try {
-        const tmpfilename = "./dic/" + req.params.country + "/tmp." + options.index + "." + counter++;
-        const stream = fs.createWriteStream(tmpfilename);
-        console.log("Received document written to file: " + tmpfilename);
-        stream.once('open', function(fd) {
-            stream.write(req.body);
-            stream.end();
-            console.log("Document is signed by SSN:");
-            const SSN = shell.exec("./dic/" + req.params.country + "/verify.sh " + tmpfilename + " " + tmpfilename + ".challenge", {
-                async: false
-            }).stdout;
-            console.log("\n");
-            fs.readFile(tmpfilename + ".challenge", function(error, content) {
-                if (error) {
-                    res.send("ERROR");
-                    return;
-                }
-
-                const data = JSON.parse(content);
-                var flag = 0;
-                for (let i = 0; i < data.Challenges.length; i++) {
-                    if (dic.dic_map.get(data.Challenges[i].Challenge) === true && Math.floor(Date.now() / 1000) - data.Challenges[i].Challenge.split('.')[2] <= dic.TIMEOUT_CHALLENGE) {
-                        flag = 1;
-                    }
-                }
-
-                if (flag === 0) {
-                    console.log("error");
-                    res.send("ERROR");
-                    return;
-
-                }
-
-
-                var year, month, curyear, curmnonth;
-                const date = new Date();
-                curyear = date.getFullYear();
-                curmonth = date.getMonth();
-                if (req.params.date !== "now") {
-                    year = req.params.date.split('.')[1];
-                    month = req.params.date.split('.')[0];
-                    if (year > curyear || month > curmonth) {
-                        console.error("Invalid token request received by client.");
-                        res.send("ERROR");
-                        return;
-                    }
-                } else {
-                    year = curyear;
-                    month = curmonth;
-                }
-                var st;
-                const age = parseInt(SSN.split('/')[0].slice(6, 8));
-                var requiredAge;
-                if (req.params.age !== "null") {
-                    requiredAge = parseInt(req.params.age);
-                    if ((requiredAge < 0 && age > -requiredAge) || (requiredAge >= 0 && age < requiredAge)) {
-                        console.error("Invalid token request received by client.");
-                        res.send("ERROR");
-                        return;
-
-                    }
-                }
-
-                if (!req.params.anon || req.params.anon === "0") {
-                    if (req.params.age !== "null") st = ComputeTokenShare(requiredAge + "@" + SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
-                    else st = ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
-
-                } else {
-                    if (req.params.age !== "null") st = ComputeTokenShare(requiredAge + "@" + SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
-                    else st = ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
-                }
-
-                console.log("DEBUG: sending " + st);
-                res.send(st);
-
-
-            });
-        });
-
-
-    } catch (err) {
-        console.error(err);
     }
 
 });

@@ -70,7 +70,7 @@ loi_utils.read(process.stdin).then(function(msg) {
         t2 = bls.bls12_381.pairing(bls.bls12_381.G1.ProjectivePoint.BASE, C);
         if (bls.bls12_381.fields.Fp12.eql(t1, t2) == false) flag = 0;
         else {
-            const input = hashes.utf8ToBytes(E.toHex() + "." + pi_A.toHex() + "." + msg); // we hash input = statement E + first message pi_A + message msg
+            const input = hashes.utf8ToBytes(E.toHex() + "." + pi_A.toHex() + "." + msg + "." + email); // we hash input = statement E + first message pi_A + message msg + email
             const fp = mod.Field(bls.bls12_381.params.r);
             const derived = hkdf.hkdf(sha256.sha256, input, undefined, 'application', 48);
             const e = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r)); // e is the hash of input converted to scalar
