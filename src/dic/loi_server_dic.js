@@ -23,7 +23,7 @@ function loi_server_dic(index, req, res) {
 
 var counter = 0;
 
-function loi_server_post_dic(options, req, res) {
+function loi_server_post_it(options, req, res) { // for Italian DIC
     try {
         const tmpfilename = "./dic/" + req.params.country + "/tmp." + options.index + "." + counter++;
         const stream = fs.createWriteStream(tmpfilename);

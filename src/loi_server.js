@@ -345,7 +345,7 @@ app.use(bodyParser.raw({
 
 app.post('/dic/:date/:country/:anon/:age', function(req, res) {
     if (req.params.country === "it")
-        dic.loi_server_post_dic(options, req, res);
+        dic.loi_server_post_it(options, req, res);
     else {
         console.error("Error. Request for unsupported or unkown provider.");
         res.sendStatus(400);
