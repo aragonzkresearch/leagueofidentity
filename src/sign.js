@@ -69,6 +69,7 @@ loi_utils.read(process.stdin).then(function(msg) {
     const E = bls.bls12_381.G1.ProjectivePoint.BASE.multiply(r);
     const F = token.multiply(r);
     randtmp = bls.bls12_381.utils.randomPrivateKey();
+    derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randomness
     const a = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
     const pi_A = bls.bls12_381.G1.ProjectivePoint.BASE.multiply(a);
     const input = hashes.utf8ToBytes(E.toHex() + "." + pi_A.toHex() + "." + msg + "." + email); // we hash input = statement E + first message pi_A + message msg + email
