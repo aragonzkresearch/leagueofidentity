@@ -28,6 +28,7 @@ commander
     .option('-f, --friends <value>', 'for tokens granted only to users with at least <value> total counts of friends.')
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-cca2, --cca2', 'encrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security.')
+    .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
     .parse(process.argv);
 
 try {
@@ -47,7 +48,8 @@ try {
     });
     const fetch_friends = loi_utils.handleOptionFriends(options, provider);
     const fetch_anon = loi_utils.handleOptionAnon(options, provider);
-
+    // for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
+    if (options.cross_country) provider = provider.split('.')[0];
     if (!options.cca2) {
         const randtmp = bls.bls12_381.utils.randomPrivateKey();
         const derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randomness

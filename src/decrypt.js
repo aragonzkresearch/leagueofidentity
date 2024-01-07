@@ -29,6 +29,7 @@ commander
     .option('-om, --output_msg <value>', 'write the decrypted message to the file <value> instead of writing it to the stdout.')
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-cca2, --cca2', 'decrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security. The first byte of the decrypted message will be 0/1 to denote failure or success of decryption.')
+    .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
     .parse(process.argv);
 
 try {
@@ -51,6 +52,8 @@ try {
     const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
     const email = options.email;
     const ciphertext = options.ciphertext;
+    // for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
+    if (options.cross_country) provider = provider.split('.')[0];
     if (!options.cca2) {
         const A = bls.bls12_381.G2.ProjectivePoint.fromHex(ciphertext.split('.')[1]);
         const B = ciphertext.split('.')[2];
