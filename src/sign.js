@@ -28,6 +28,7 @@ commander
     .option('-os, --output_signature <value>', 'write the signature to the file <value> instead of writing it to the stdout.')
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-f, --friends <value>', 'for tokens granted only to users with at least <value> total counts of friends.')
+    .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -53,6 +54,8 @@ const year = loi_utils.getYear(options);
 const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
 const token = bls.bls12_381.G1.ProjectivePoint.fromHex(options.token);
 const email = options.email; // TODO: we could reject if the email in the token is different from the one provided as input to the command.
+// for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
+if (options.cross_country) provider = provider.split('.')[0];
 
 
 loi_utils.read(process.stdin).then(function(msg) {

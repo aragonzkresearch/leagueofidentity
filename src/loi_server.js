@@ -343,7 +343,7 @@ app.use(bodyParser.raw({
     "type": "application/octet-stream"
 }));
 
-app.post('/dic/:date/:country/:anon/:age', function(req, res) {
+app.post('/dic/:date/:country/:anon/:age/:cross_country', function(req, res) {
     if (req.params.country === "it")
         dic.loi_server_post_it(options, req, res);
     else {

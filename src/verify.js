@@ -28,6 +28,7 @@ commander
     .option('-or, --output_result <value>', 'write the result (\"0\" or \"1\") to the file <value> instead of writing it to the stdout.')
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-f, --friends <value>', 'for tokens granted only to users with at least <value> total counts of friends.')
+    .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
     .parse(process.argv);
 
 const options = commander.opts();
@@ -45,6 +46,8 @@ try {
 }
 const fetch_friends = loi_utils.handleOptionFriends(options, provider);
 const fetch_anon = loi_utils.handleOptionAnon(options, provider);
+// for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
+if (options.cross_country) provider = provider.split('.')[0];
 
 const month = loi_utils.getMonth(options);
 const year = loi_utils.getYear(options);

@@ -5,7 +5,7 @@ This repository provides a PoC implementation of the ``League of Identity `` (`L
 ``LoI`` is a network of nodes with the following functionalities. ``LoI`` publishes what is called a ``master public key`` (``MPK``).
 Alice logs into her own Google (or Facebook, Twitter, ...) account `alice@gmail.com` from a given `LoI` website and gets what is called an `OAuth 2` `access token`. Alice can send the so obtained `access token` to a sufficiently large set of nodes of `LoI` requesting to these nodes a cryptographic ``token`` corresponding to her email address and a given month and such set of nodes, upon verifying that the ``access token`` is valid, send back to Alice a set of `token shares` by means of which Alice can compute the (full) `token` corresponding to her email address and the specified month. The token can be relative to other identity information like a phone number or the social security number etc. (see below).
 The token can be used for the following functionalities.
-### Functionality of the `LoI` token
+### Functionalities of the `LoI` token
 * Encryption. Bob can use the `MPK` of `LoI` to encrypt a message associated to `alice@gmail.com` and a given month and can publish the resulting ciphertext on a blockchain or send it directly to Alice. 
 Alice can use the previously obtained `token` to decrypt the ciphertext received by Bob and recover the secret message.
 We remark that the `token` is different from the `access token`.
@@ -15,10 +15,10 @@ Consider the following applications scenarios:
 	- The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`. 
 	- `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town or the DAO of < 18 years old teenagers. 
 	- `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
-	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO memembers.
-	- `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the admins of the page can create a bridge between Facebook and web3 applications.
+	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO members.
+	- `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the administrators of the page can create a bridge between Facebook and web3 applications.
 
-Moreover we envions the signature to satisfy the following property:
+Moreover we require the signature to satisfy the following property:
 * Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verifying such signatures on Ethereum would consume too much GAS. Instead, the `LoI` tokens for digital identity cards can be used to produce signatures that are efficiently verifiable in Ethereum and other blockchains.
 
 We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them.
@@ -209,9 +209,12 @@ For example the Italian `DIC` provides in the `serialNumber` field the identity 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
 #### Creating DAOs of citizens younger or older than a given age
 With the option `--age <value>` it is possible to require that the token be granted only to citizens that are either born in the year `value` or after if `value` is a positive integer of the form `XX` or born in the year  `-value` if `value` is a negative integer of the form `-XX`.
-Then, if for example we use the option `--age 90` (or `--age -90`) for a user with `SSN` (or `identifer` depending on whether the option `--anon` is not used or is used) equal to `Z` we should then specify `--email 1990@Z` (or `--email -1990@Z`) to the commands `encrypt, decrypt, sign, verify`. 
-Note that this option is very powerful along with the option `--anon`. Indeed, in this case the user is identifed by an `email` of the form `1990@Z` (or `-1990@Z`) where `Z` is somehow anonymous and notwithstanding a smart contract can differentiate the age of the user to create e.g. the DAO of citizens that are born after 1990 (or before). 
+Then, if for example we use the option `--age 90` (or `--age -90`) for a user with `SSN` (or `identifier` depending on whether the option `--anon` is not used or is used) equal to `Z` we should then specify `--email 1990@Z` (or `--email -1990@Z`) to the commands `encrypt, decrypt, sign, verify`. 
+Note that this option is very powerful along with the option `--anon`. Indeed, in this case the user is identified by an `email` of the form `1990@Z` (or `-1990@Z`) where `Z` is somehow anonymous and notwithstanding a smart contract can differentiate the age of the user to create e.g. the DAO of citizens that are born after 1990 (or before). 
 Our formulation of the age information is tailored for the Italian `DIC` and could be different for other cards.
+
+#### Cross-country tokens
+If the options `--cross_country` is set, the token is set to to a generic value `dic`. In this way tokens, ciphertexts and signatures for different countries can be interoperable. You need anyway to specify the full provider (e.g., `dic.it`) to all commands in order to extract country specific information from the `DIC`.
 
 #### About creating the DAO of the citizens of a given town or province
 Unfortunately, `DICs` do not usually contain info like the Town of residency of the citizen.

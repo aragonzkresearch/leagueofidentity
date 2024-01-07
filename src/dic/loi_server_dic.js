@@ -75,6 +75,8 @@ function loi_server_post_it(options, req, res) { // for Italian DIC
                     month = curmonth;
                 }
                 var st;
+                if (req.params.cross_country !== "null") req.params.country = "";
+                else req.params.country = "." + req.params.country;
                 var age = parseInt(SSN.split('/')[0].slice(6, 8));
                 if (age < AGE_LIMIT) age = 2000 + age;
                 else age = 1900 + age;
@@ -99,12 +101,12 @@ function loi_server_post_it(options, req, res) { // for Italian DIC
                 }
 
                 if (!req.params.anon || req.params.anon === "0") {
-                    if (req.params.age !== "null") st = cts.ComputeTokenShare(requiredAge + "@" + SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
-                    else st = cts.ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic." + req.params.country, "null", "0");
+                    if (req.params.age !== "null") st = cts.ComputeTokenShare(requiredAge + "@" + SSN.split('/')[0], options.share, month, year, "0", "dic" + req.params.country, "null", "0");
+                    else st = cts.ComputeTokenShare(SSN.split('/')[0], options.share, month, year, "0", "dic" + req.params.country, "null", "0");
 
                 } else {
-                    if (req.params.age !== "null") st = cts.ComputeTokenShare(requiredAge + "@" + SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
-                    else st = cts.ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic." + req.params.country, "null", "1");
+                    if (req.params.age !== "null") st = cts.ComputeTokenShare(requiredAge + "@" + SSN.split('/')[1], options.share, month, year, "0", "dic" + req.params.country, "null", "1");
+                    else st = cts.ComputeTokenShare(SSN.split('/')[1], options.share, month, year, "0", "dic" + req.params.country, "null", "1");
                 }
 
                 console.log("DEBUG: sending " + st);
