@@ -25,6 +25,7 @@ We stress that `LoI` aims at offering both encryption and authentication/signatu
 
 
 ## Running a demo
+### Currently supported providers
 The current demo only offers encryption and supports the following providers: `google`, `facebook, google.phone` and `dic.it`. The provider `google.phone` uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. The provider `dic.it` is for Italian digital identity cards (tested on v3.0).
 
 ### Install the required packages
