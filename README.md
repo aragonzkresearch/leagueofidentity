@@ -17,6 +17,7 @@ Consider the following applications scenarios:
 	- `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
 	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO members.
 	- `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the administrators of the page can create a bridge between Facebook and web3 applications.
+	- The `LoI` tokens could be used as anti-spam tool, specifically the token could be related to accounts that encompass properties that are hard to forge on large scale. The current demo for instance allow to get tokens for `facebook` accounts with at least `X` friends. More stringent might be required to combat bots.
 
 Moreover we envision the signature to satisfy the following property:
 * Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verifying such signatures on Ethereum would consume too much GAS. Instead, the `LoI` signatures for digital identity cards should be efficiently verifiable in Ethereum and other blockchains.
