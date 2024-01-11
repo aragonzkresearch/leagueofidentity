@@ -2,15 +2,14 @@
 // node encrypt.js -k mpk -e email (or domain/phone) -m month.year  [OPTIONS]
 // the message is taken from the stdin
 
-const bls = require('@noble/curves/bls12-381');
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
 const hashes = require("@noble/hashes/utils");
 const utils = require("@noble/curves/abstract/utils");
-const bls_verify = require("@noble/curves/abstract/bls");
 const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const loi_utils = require("./utils");
+const eth = require("./ethereum_mode");
 const commander = require('commander');
 const crypto = require('crypto');
 const {
@@ -29,6 +28,7 @@ commander
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-cca2, --cca2', 'encrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security.')
     .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
+    .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine. NOT SUPPORTED YET, DO NOT USE IT.')
     .parse(process.argv);
 
 try {
@@ -37,31 +37,36 @@ try {
     provider = loi_utils.handleProviders(options, provider);
     const month = loi_utils.getMonth(options);
     const year = loi_utils.getYear(options);
+    const fetch_friends = loi_utils.handleOptionFriends(options, provider);
+    const fetch_anon = loi_utils.handleOptionAnon(options, provider);
+    const fetch_ethereum = options.ethereum ? "1" : "null";
+    var bg;
+    if (fetch_ethereum === "null") bg = require('@noble/curves/bls12-381').bls12_381;
+    else bg = require('@noble/curves/bn254').bn254;
     //const month = options.month.split('.')[0];
     //const year = options.month.split('.')[1];
-    const mpk = bls.bls12_381.G2.ProjectivePoint.fromHex(options.key);
+    const mpk = bg.G2.ProjectivePoint.fromHex(options.key);
     const email = options.email;
     var Log;
     Log = new Console({
         stdout: options.output_ciphertext ? fs.createWriteStream(options.output_ciphertext) : process.stdout,
         stderr: process.stderr,
     });
-    const fetch_friends = loi_utils.handleOptionFriends(options, provider);
-    const fetch_anon = loi_utils.handleOptionAnon(options, provider);
     // for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
     if (options.cross_country) provider = provider.split('.')[0];
     if (!options.cca2) {
-        const randtmp = bls.bls12_381.utils.randomPrivateKey();
+        const randtmp = bg.utils.randomPrivateKey();
         const derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 48); // 48 bytes for 32-byte randomness
-        const fp = mod.Field(bls.bls12_381.params.r);
-        const s = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
-        const A = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(s);
+        const fp = mod.Field(bg.params.r);
+        const s = fp.create(mod.hashToPrivateScalar(derived, bg.params.r));
+        const A = bg.G2.ProjectivePoint.BASE.multiply(s);
         const mpk_to_s = mpk.multiply(s);
 
-        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
-        const h = bls.bls12_381.G1.hashToCurve(id);
-        const g_id = bls.bls12_381.pairing(h, mpk_to_s);
-        var B = bls.bls12_381.fields.Fp12.toBytes(g_id);
+        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon + ".." + fetch_ethereum);
+        //const h = bg.G1.hashToCurve(id);
+        const h = eth.hashToCurve(id, fetch_ethereum);
+        const g_id = bg.pairing(h, mpk_to_s);
+        var B = bg.fields.Fp12.toBytes(g_id);
 
         loi_utils.read(process.stdin).then(function(msg) {
             msg = hashes.utf8ToBytes(msg);
@@ -84,14 +89,15 @@ try {
             sigma_msg.set(sigma);
             sigma_msg.set(msg, sigma.length);
             const derived = hkdf.hkdf(sha256.sha256, sigma_msg, undefined, 'application', 48); // 48 bytes for 32-byte randomness
-            const fp = mod.Field(bls.bls12_381.params.r);
-            const s = fp.create(mod.hashToPrivateScalar(derived, bls.bls12_381.params.r));
-            const A = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(s);
+            const fp = mod.Field(bg.params.r);
+            const s = fp.create(mod.hashToPrivateScalar(derived, bg.params.r));
+            const A = bg.G2.ProjectivePoint.BASE.multiply(s);
             const mpk_to_s = mpk.multiply(s);
-            const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon);
-            const h = bls.bls12_381.G1.hashToCurve(id);
-            const g_id = bls.bls12_381.pairing(h, mpk_to_s);
-            var B = bls.bls12_381.fields.Fp12.toBytes(g_id);
+            const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + month + ".." + year + ".." + fetch_friends + ".." + fetch_anon + ".." + fetch_ethereum);
+            //const h = bg.G1.hashToCurve(id);
+            const h = eth.hashToCurve(id, fetch_ethereum);
+            const g_id = bg.pairing(h, mpk_to_s);
+            var B = bg.fields.Fp12.toBytes(g_id);
             const length = msg.length;
             const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
             msg = hashes.bytesToHex(msg);

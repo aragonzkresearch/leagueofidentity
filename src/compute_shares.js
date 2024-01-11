@@ -1,6 +1,5 @@
 // node compute_shares.js -t t -n n
 // t is the threshold who can reconstruct the master secret key and n is the number of nodes of LoI network
-const bls = require("@noble/curves/bls12-381");
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
 const utils = require("@noble/curves/abstract/utils");
@@ -12,9 +11,15 @@ commander
     .usage('-t <value> -n <value>')
     .requiredOption('-t, --threshold <value>', 'threshold of nodes required to reconstruct the master secret key.')
     .requiredOption('-n, --no_nodes <value>', 'total number of nodes.')
+    .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine. NOT SUPPORTED YET, DO NOT USE IT.')
     .parse(process.argv);
 
 const options = commander.opts();
+const fetch_ethereum = options.ethereum ? "1" : "null";
+var bg;
+if (fetch_ethereum === "null") bg = require('@noble/curves/bls12-381').bls12_381;
+else bg = require('@noble/curves/bn254').bn254;
+
 const A = [];
 const s = [];
 
@@ -22,20 +27,20 @@ var privtmp;
 var derived;
 for (let i = 1; i < options.threshold; i++) {
 
-    privtmp = bls.bls12_381.utils.randomPrivateKey();
+    privtmp = bg.utils.randomPrivateKey();
 
     derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48); // 48 bytes for 32-byte input
-    A[i] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
+    A[i] = mod.hashToPrivateScalar(derived, bg.params.r);
     console.log("DEBUG: " + i + "-th coefficient of the " + (options.threshold - 1) + "-degree polynomial: " + A[i]);
 
 }
 
-privtmp = bls.bls12_381.utils.randomPrivateKey();
+privtmp = bg.utils.randomPrivateKey();
 derived = hkdf.hkdf(sha256.sha256, privtmp, undefined, 'application', 48);
-A[0] = mod.hashToPrivateScalar(derived, bls.bls12_381.params.r);
-const fp = mod.Field(bls.bls12_381.params.r);
+A[0] = mod.hashToPrivateScalar(derived, bg.params.r);
+const fp = mod.Field(bg.params.r);
 console.log("master secret key: " + utils.bytesToHex(fp.toBytes(A[0])));
-const mpk = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(fp.create(A[0]));
+const mpk = bg.G2.ProjectivePoint.BASE.multiply(fp.create(A[0]));
 console.log("master public key: " + mpk.toHex());
 
 var tmp;
@@ -78,10 +83,10 @@ for (i = 0n; i < options.threshold; i++) Q[i] = i + 1n;
 ComputeLagrangeCoefficients(lambda, options.threshold, Q);
 const sk = [];
 const pk = [];
-tmp = bls.bls12_381.G2.ProjectivePoint.BASE.subtract(bls.bls12_381.G2.ProjectivePoint.BASE);
+tmp = bg.G2.ProjectivePoint.BASE.subtract(bg.G2.ProjectivePoint.BASE);
 for (i = 0n; i < options.threshold; i++) {
     sk[Q[i]] = fp.mul(s[Q[i]], lambda[Q[i]]);
-    pk[Q[i]] = bls.bls12_381.G2.ProjectivePoint.BASE.multiply(sk[Q[i]]);
+    pk[Q[i]] = bg.G2.ProjectivePoint.BASE.multiply(sk[Q[i]]);
     tmp = tmp.add(pk[Q[i]]);
 }
 

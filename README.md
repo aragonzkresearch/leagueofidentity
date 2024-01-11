@@ -53,8 +53,8 @@ npm install --save @noble-curves@1.2.0
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
 
 ### Prerequisites
-It is strongly suggested that you create a Google developer account and get your `client id` (see below). However, you will be able to run all the following commands even without that.
-Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/loi_server.js`.
+It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to run all the following commands even without that.
+Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/params.json`.
 Similarly, for `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 ### Get a Google (or Facebook) access token
 You first need to run a web server on the port `5000`, for instance:
@@ -94,8 +94,7 @@ share of the server 2: 22e66faca225813fc0292ce2b073e15960d959b72933b266bf9d516e7
 share of the server 3: 54e6bc86e03bc1152c9184bc440777123bd6a8f498ce474678640a5323a41f27
 reconstructed master public key: 98a13c5e305dbad1a006441e59234870103240416f4ec443b930fb6762f80e9254bd78bd3f27ad599df9d522ee724256054221f3bdfe3f3f5233927ec7bd5f585d2f5c7d65bb8efbc36ea8cc24464f65274c40a78cdabda2ec02b5b796d0a2a8
 ```
-Henceforth we will denote by `share1` (resp. `share2`, `share3`) the so computed `share of the server 1` etc.
-So, in the following commands whenever we will write e.g., `share1` you need to replace it with the previous value.
+Henceforth we will denote by `share1` (resp. `share2`, `share3`) the files containing the so computed `share of the server 1` etc.
 
 The previous computation simulates the computation of `Distributed Key Generation` (`DKG`) procedure with a trusted dealer.
 You can replace it with a real `DKG` procedure without trusted dealer but for simplicity we do not do that.
@@ -106,7 +105,7 @@ node loi_server.js -p 8001 -s share1 &
 node loi_server.js -p 8002 -s share2 &
 node loi_server.js -p 8003 -s share3 &
 ```
-Do not forget to replace `share1`, `share2`, `share3` with the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
+Do not forget to store in the files `share1`, `share2`, `share3` the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
 Each server is implicitly associated resp. with the index `1,2,3`.
 ### Get a `token` from `LoI`.
 Now you can run the following:

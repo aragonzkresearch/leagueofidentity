@@ -33,11 +33,6 @@ async function read(stream) {
     for await (const chunk of stream) chunks.push(chunk);
     return Buffer.concat(chunks).toString('utf8');
 }
-async function read(stream) {
-    const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
-    return Buffer.concat(chunks).toString('utf8');
-}
 
 function prov_is_dic(provider) {
     if (provider.split('.')[0] === 'dic' && provider.split('.')[1] === 'it') return true;
