@@ -1,5 +1,5 @@
 // NOT SUPPORTED YET.
-//  Unfortunately, noble does not fully support bn254. We leave this option in the case one day noble will introduce full support for bn254. However, notice that if next upgrades Ethereum will adopt bls12 there will no need for bn254. 
+//  Unfortunately, noble does not fully support bn254. We leave this option in the case one day noble will introduce full support for bn254. However, notice that if in next upgrades Ethereum will adopt bls12 there will no need for bn254. 
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
 const hashes = require("@noble/hashes/utils");
