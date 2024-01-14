@@ -30,7 +30,7 @@ The current demo only offers encryption and supports the following providers:
 * `google`: associate as identity the email address set in the user's Google account.
 * `facebook`: associate as identity the email address set in the user's Facebook account.
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
-* `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see below).
+* `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
 
 ## Installation
 ### Installing the required packages
