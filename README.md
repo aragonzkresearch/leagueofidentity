@@ -59,17 +59,18 @@ npm install --save @noble-curves@1.2.0
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
 
 ### Prerequisites
-It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to run all the following commands even without that.
-Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/params.json`.
+It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to use the demo for the provider `google` even without that.
+Instead, for the provider `facebook` you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/params.json`.
 For `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
 For `eth` you need to fill the value `INFURA_API_KEY` in the same file with an Infura API Key. 
-You first need to run a web server on the port `5000`, for instance:
+
+Once you configured the parameters in `params.json`, you need to run a web server on the port `5000`, for instance:
 ```bash
 cd web
 python3 -m http.server 5000
 ```
 
-This is because the `main.js` file that implements the web page embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook.
+We used the port `5000` because the file `main.js` that implements the web page embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with the `client id` we provided. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook. 
 ## How to Use `LoI` modules
 ### Get a Google or Facebook access token
 Open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
