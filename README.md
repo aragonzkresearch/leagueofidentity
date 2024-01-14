@@ -68,7 +68,9 @@ python3 -m http.server 5000
 ```
 
 This is because the `main.js` file that implements the web page embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with that `client id`. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook.
-Then open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
+## How to Use `LoI` modules
+### Get an access token
+Open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
 <br>
@@ -79,7 +81,7 @@ You can select `facebook` from the menu to get a `facebook` access token.  In th
 
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
-## Compute the shares and run the `LoI` nodes
+### Compute the shares and run the `LoI` nodes
 Henceforth, we assume to be working in the folder `src`.
 `LoI` is associated to two parameters: `n`, the number of nodes in the network, and `t`, the threshold of nodes who can reconstruct the secrets and break the security.
 Let us assume henceforth that `t=2` and `n=3`.
@@ -111,7 +113,7 @@ node loi_server.js -p 8003 -s share3 &
 ```
 Do not forget to store in the files `share1`, `share2`, `share3` the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
 Each server is implicitly associated resp. with the index `1,2,3`.
-## Get a `token` from `LoI`.
+### Get a `token` from `LoI`.
 Now you can run the following:
 ```bash
 node get_token.js -A access_token -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003
@@ -134,7 +136,6 @@ Henceforth we will denote by `mpk` the so computed `master public key`.
 So, in the following commands whenever we will write e.g., `mpk` you need to replace it with the previous value. Similarly, for the string `token`.
 Note that the reconstructed `mpk` computed by the previous command is just used for debug purposes. In real applications one should use as master public key the one that is made public by the `LoI` members at the launch of the system.
 
-### How to Use `LoI` modules
 ### Encrypt
 Let us assume that the secret message to encrypt is the string ``aa`` and it is contained in the file `msg`.
 Run the following command to encrypt under my email ``vinciovino@gmail.com`` with the tag of ``December 2023``:
