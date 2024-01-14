@@ -27,10 +27,10 @@ We stress that `LoI` aims at offering both encryption and authentication/signatu
 
 ### Currently supported providers
 The current demo only offers encryption and supports the following providers: 
-* `google`: associate to a user his/her email address set in his/her Google account.
-* `facebook`: associate to a user his/her email address set in his/her Facebook account.
-* `google.phone`: use Google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. 
-* `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0).
+* `google`: associate as identity the email address set in the user's Google account.
+* `facebook`: associate as identity the email address set in the user's Facebook account.
+* `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
+* `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see below).
 
 ## Installation
 ### Installing the required packages
