@@ -24,7 +24,7 @@ const commander = require('commander');
 const dic = require('./dic/loi_server_dic');
 const loi_utils = require("./utils");
 const cts = require("./compute_token_share");
-const eth_provider = require("./eth_provider/loi_server_dic");
+const eth_provider = require("./eth_provider/loi_server_eth");
 const bodyParser = require('body-parser');
 const fs = require('fs');
 commander
