@@ -31,7 +31,7 @@ The current demo only offers encryption and supports the following providers:
 * `facebook`: associate as identity the email address set in the user's Facebook account.
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
-* `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and $wei$ is the amount of Wei owned by the given adddress `addr`. With the option `--anonymous` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of wei held by `addr`. In both cases (with `-anon` set or not set), the token is issued only if the address `addr` holds more than $0$ Wei.
+* `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `--anonymous` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of wei held by `addr`. In both cases (with `-anon` set or not set), the token is issued only if the address `addr` holds more than $0$ Wei.
 
 ## Installation
 ### Installing the required packages
