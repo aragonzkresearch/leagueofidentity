@@ -25,11 +25,15 @@ Moreover we envision the signature to satisfy the following property:
 We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them.
 
 
-## Running a demo
 ### Currently supported providers
-The current demo only offers encryption and supports the following providers: `google`, `facebook, google.phone` and `dic.it`. The provider `google.phone` uses google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. The provider `dic.it` is for Italian digital identity cards (tested on v3.0).
+The current demo only offers encryption and supports the following providers: 
+	- `google`: associate to a user his/her email address set in his/her Google account.
+	- `facebook`: associate to a user his/her email address set in his/her Facebook account.
+	- `google.phone`: use Google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. 
+	- `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0).
 
-### Install the required packages
+## Installation
+### Installing the required packages
 The demo has been tested using `node v16.20.2`.
 You can switch to such version using the command:
 ```bash
@@ -75,7 +79,7 @@ You can select `facebook` from the menu to get a `facebook` access token.  In th
 
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
-### Compute the shares and run the `LoI` nodes
+## Compute the shares and run the `LoI` nodes
 Henceforth, we assume to be working in the folder `src`.
 `LoI` is associated to two parameters: `n`, the number of nodes in the network, and `t`, the threshold of nodes who can reconstruct the secrets and break the security.
 Let us assume henceforth that `t=2` and `n=3`.
@@ -107,7 +111,7 @@ node loi_server.js -p 8003 -s share3 &
 ```
 Do not forget to store in the files `share1`, `share2`, `share3` the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
 Each server is implicitly associated resp. with the index `1,2,3`.
-### Get a `token` from `LoI`.
+## Get a `token` from `LoI`.
 Now you can run the following:
 ```bash
 node get_token.js -A access_token -t 2 -n 3 -l 2 http://localhost:8002 3 http://localhost:8003
@@ -130,6 +134,7 @@ Henceforth we will denote by `mpk` the so computed `master public key`.
 So, in the following commands whenever we will write e.g., `mpk` you need to replace it with the previous value. Similarly, for the string `token`.
 Note that the reconstructed `mpk` computed by the previous command is just used for debug purposes. In real applications one should use as master public key the one that is made public by the `LoI` members at the launch of the system.
 
+### How to Use `LoI` modules
 ### Encrypt
 Let us assume that the secret message to encrypt is the string ``aa`` and it is contained in the file `msg`.
 Run the following command to encrypt under my email ``vinciovino@gmail.com`` with the tag of ``December 2023``:
@@ -170,7 +175,7 @@ For security the servers should check whether the access token has not been alre
 
 This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
-### Digital Identity Cards
+## Digital Identity Cards
 The flow to use digital identity cards (`DICs`) is the following. The following example is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will adopt it).
 With the command:
 
@@ -208,16 +213,16 @@ For other countries you would just need to create separate folders containing th
 For example the Italian `DIC` provides in the `serialNumber` field the identity number of the `DIC` itself that can be alternatively used as identity information.
 
 Notes: the current implementation does not check if the signed file was signed by a user whose `DIC` certificate was revoked. This should be easy to add using the country specific `OCSP` service. Moreover there are two types of `local issuer certificates` for Italy and the current implementation assumes that each certificate is signed under only one of them so it will fail when a user certificate is signed by the second local issuer certificate.
-#### Creating DAOs of citizens younger or older than a given age
+### Creating DAOs of citizens younger or older than a given age
 With the option `--age <value>` it is possible to require that the token be granted only to citizens that are either born in the year `value` or after if `value` is a positive integer of the form `XX` or born in the year  `-value` if `value` is a negative integer of the form `-XX`.
 Then, if for example we use the option `--age 90` (or `--age -90`) for a user with `SSN` (or `identifier` depending on whether the option `--anon` is not used or is used) equal to `Z` we should then specify `--email 1990@Z` (or `--email -1990@Z`) to the commands `encrypt, decrypt, sign, verify`. 
 Note that this option is very powerful along with the option `--anon`. Indeed, in this case the user is identified by an `email` of the form `1990@Z` (or `-1990@Z`) where `Z` is somehow anonymous and notwithstanding a smart contract can differentiate the age of the user to create e.g. the DAO of citizens that are born after 1990 (or before). 
 Our formulation of the age information is tailored for the Italian `DIC` and could be different for other cards.
 
-#### Cross-country tokens
+### Cross-country tokens
 If the options `--cross_country` is set, the token is set to to a generic value `dic`. In this way tokens, ciphertexts and signatures for different countries can be interoperable. You need anyway to specify the full provider (e.g., `dic.it`) to all commands in order to extract country specific information from the `DIC`.
 
-#### About creating the DAO of the citizens of a given town or province
+### About creating the DAO of the citizens of a given town or province
 Unfortunately, `DICs` do not usually contain info like the Town of residency of the citizen.
 However, a `DIC` does often store another certificate signed with the citizen's certificate that in turn does contain additional information like the town, street, etc. of residency of the citizen.
 Therefore, it should be possible to extend the current demo to have the user to send this additional certificate in order to get a token corresponding e.g. to a given town.
