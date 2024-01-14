@@ -161,15 +161,16 @@ You should get in the end the recovered message contained in the file ``msg``.
 
 ### Phone number encryption (`phencryption`)
 With the provider `google.phone` you can specify phone numbers to the argument `-e` in the above commands and you will be able to encrypt/decrypt with respect to phone numbers that are verified in public profiles of Google users.
-### CCA2-security
+#### CCA2-security
 With the option `-cca2` to both `encrypt.js` and `decrypt.js` you can require security against adaptive chosen ciphertext attacks (`IND-CCA2`), the strongest form of security for encryption. The decrypted message will start with a character that is either `1` or `0` depending on whether the decryption was successful or not. 
 ### Signatures
 The commands `node sign.js` and `node verify.js` allow resp. to sign and verify signatures. We defer the programs' interface to the help provided by the `--help` option.
-### Group encryption/signatures
+#### Group encryption/signatures
 For group encryption/signatures  specify the `--group` option to the `get_token.js` command and specify the domain (e.g., `oldcrypto.com`) instead of a full email in the other commands.
-### Anti-spam token
+### Additional options
+#### Anti-spam token
 With the `facebook` token you can specify the option `--friends X` (to all commands) to associate the token only to Facebook users with at least `X` number of friends. This may have applications as anti-spam tool in blockchains since it makes harder to create fake users.
-### Anonymity 
+#### Anonymity 
 With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
 For security the servers should check whether the access token has not been already used but this is not done in the current demo.
 
