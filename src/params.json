@@ -5,6 +5,8 @@
         "FACEBOOK_CLIENT_ID": "377291984666448",
         "FACEBOOK_SECRET_ID": "",
         "TIMEOUT_CHALLENGE": "1800",
-        "DIC_IT_AGE_LIMIT": "19"
+        "DIC_IT_AGE_LIMIT": "19",
+	"INFURA_API_KEY": "https://sepolia.infura.io/v3/89235f1ec0f84511ade8dcf9aa9529f1",
+	"SignMessage": "Do not sign this message in any application different than League of Identity. The signature will be used to authenticate to the League of Identity network. Time:" 
     }
 }

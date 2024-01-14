@@ -15,7 +15,7 @@ Consider the following applications scenarios:
 	- The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`. 
 	- `LoI` can issue tokens to the holders of valid digital identity cards (`DIC`) and this would allow to create e.g., a `DAO` of the citizens of a given town or the DAO of < 18 years old teenagers. 
 	- `LoI` can issue tokens corresponding to Instagram accounts with more than 1 million of followers thus creating a `DAO of Influencers`.
-	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO members.
+	- `LoI` can issue tokens corresponding to Ethereum NFTs held in a smart contract. The `LoI` token can be then used as a `bridge` in other blockchains or can be used in Ethereum itself for other functionalities: e.g., ZK proofs, encrypted data for DAO members. Currently, we support tokens for Ethereum addresses (possibly associated with their Wei balance) thus allowing to create a bridge between Etherem and other blockchains and to encrypt data with respect to Ethereum addresses.
 	- `LoI` can issue tokens corresponding to Facebook accounts who are members of a given Facebook page and the `LoI` token can be then used e.g., on Ethereum or other blockchains as a mean to create a DAO of the members of that page. In particular the administrators of the page can create a bridge between Facebook and web3 applications.
 	- The `LoI` tokens could be used as anti-spam tool, specifically the token could be related to accounts that encompass properties that are hard to forge on large scale. The current demo for instance allow to get tokens for `facebook` accounts with at least `X` friends. More stringent might be required to combat bots.
 
@@ -31,6 +31,7 @@ The current demo only offers encryption and supports the following providers:
 * `facebook`: associate as identity the email address set in the user's Facebook account.
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
+* `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and $wei$ is the amount of Wei owned by the given adddress `addr`. With the option `--anonymous` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of wei held by `addr`. In both cases (with `-anon` set or not set), the token is issued only if the address `addr` holds more than $0$ Wei.
 
 ## Installation
 ### Installing the required packages
@@ -40,7 +41,7 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a stand-alone version is embedded in the `web` folder.
-For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser, web3` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
@@ -52,6 +53,7 @@ npm install --save console
 npm install --save fs
 npm install --save shelljs
 npm install --save body-parser
+npm install --save web3
 npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
@@ -59,7 +61,8 @@ Note that for `noble-curves` we stick to the version `1.2.0` we used for the tes
 ### Prerequisites
 It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to run all the following commands even without that.
 Instead, for Facebook you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/params.json`.
-Similarly, for `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
+For `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
+For `eth` you need to fill the value `INFURA_API_KEY` in the same file with an Infura API Key. 
 You first need to run a web server on the port `5000`, for instance:
 ```bash
 cd web
@@ -172,9 +175,10 @@ For group encryption/signatures  specify the `--group` option to the `get_token.
 With the `facebook` token you can specify the option `--friends X` (to all commands) to associate the token only to Facebook users with at least `X` number of friends. This may have applications as anti-spam tool in blockchains since it makes harder to create fake users.
 #### Anonymity 
 With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
-For security the servers should check whether the access token has not been already used but this is not done in the current demo.
+For all providers different from `eth`, in this case for security the servers should check whether the access token has not been already used but this is not done in the current demo.
+For the provider `eth`, this option sets the identity to a string of the form `0@addr` where `addr` is an Ethereum address.
 
-This option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
+Fpr all providers different from `eth`, this option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
 ## Digital Identity Cards
 The flow to use digital identity cards (`DICs`) is the following. The following example is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will adopt it).

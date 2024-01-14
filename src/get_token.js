@@ -1,8 +1,4 @@
-// usage:
-// node get_token.js -A access_token  -t t -n n -l i_1 server1_addr:port ... i_t servert_addr:port month.year -g  
-// where token is the provider's token you get from the webpage, t and n are the parameters for the t out of n secret sharing and the following is the list of pairs consisting of indices and addresses (with ports) of the t servers to contact to get the shares needed to reconstruct the LoI token and month.year is field to request a token for the current month.year tag (setting month.year to "now") or to an old month.year tag, and group is a 0/1 flag to indicate whether the identity should be for thegroup (e.g., if the email is me@mycompany.com, if group=1 the identity will be set to mycompany.com).
-
-
+// for usage see: https://github.com/aragonzkresearch/leagueofidentity/tree/master
 // The file params.json contains configuration directive, in particular here we will use TIMEOUT_CHALLENGE for the digital identity card module 
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
@@ -81,7 +77,7 @@ for (let i = 0; i < options.threshold; i++) {
     Addresses[i] = options.list[i * 2 + 1];
 }
 const group = !options.group ? "0" : "1";
-if (group === "1" && (provider === "google.phone" || loi_utils.prov_is_dic(provider))) {
+if (group === "1" && (provider === 'google.phone' || provider === 'eth' || loi_utils.prov_is_dic(provider))) {
     console.error("Option -g is not compatible with provider " + provider + ".");
     process.exit(1);
 

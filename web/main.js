@@ -1,5 +1,36 @@
 const GOOGLE_CLIENT_ID = "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com"; // (google) client id
 const FB_CLIENT_ID = "377291984666448"; // (facebook) client id
+const CHAIN = "Sepolia";
+var CHAIN_ID;
+const web3 = new Web3(window.ethereum);
+if (CHAIN === "Sepolia" || CHAIN === "sepolia")
+    CHAIN_ID = 11155111; // Goerli = 5, Sepolia = 11155111
+CHAIN_ID = 1;
+var flag = 0;
+const SignMessage = "Do not sign this message in any application different than League of Identity. The signature will be used to authenticate to the League of Identity network. Time:"; // CONVENTION: this message should NOT contain any character ':' because this message is concatenated with a UNIX time and we use ':' to split the message with the UNIX time.
+
+async function checkMetaMaskAvailability() {
+    if (window.ethereum) {
+        try {
+            // Request access to MetaMask accounts
+            await window.ethereum.request({
+                method: "eth_requestAccounts"
+            });
+            flag = 1;
+            return true;
+        } catch (err) {
+            document.getElementById("status2").style.color = "red";
+            document.getElementById("status2").innerText = "Failed to connect to Metamask";
+            console.error("Failed to connect to MetaMask:", err);
+            return false;
+        }
+    } else {
+        document.getElementById("status2").style.color = "red";
+        document.getElementById("status2").innerText = "Metamask not found";
+        console.error("MetaMask not found");
+        return false;
+    }
+}
 
 document.getElementById("instructions").addEventListener("click", async () => {
     document.getElementById("status2").style.color = "white";
@@ -10,7 +41,7 @@ document.getElementById("instructions").addEventListener("click", async () => {
     status3.innerText = "";
     status4.innerText = "";
     status5.innerText = "";
-    status2.innerText = "*Connect*\nClick on \"Get access token\" to log into your Google account and get the access token.\nYou can use the access token with the command lines tool of League of Identity.\n\n*Logout*\nClick on \"Logout\" to logout from your account.";
+    status2.innerText = "*Connect*\nClick on \"Get access token\" to log into your Google, Facebook or Ethereum account and get the access token.\nYou can use the access token with the command lines tool of League of Identity.\n\n*Logout*\nClick on \"Logout\" to logout from your account.";
 
 });
 
@@ -32,7 +63,32 @@ hello.init({
     facebook: FB_CLIENT_ID
 });
 document.getElementById("accountbutton").addEventListener("click", async () => {
-    var network = document.getElementById("menu").value;
+    const network = document.getElementById("menu").value;
+    if (network === "ethereum") {
+        if (flag === 0 && checkMetaMaskAvailability() === false) return;
+
+        const accounts = await web3.eth.getAccounts();
+        const myaddr = accounts[0];
+        const time = Math.floor(Date.now() / 1000);
+        const msg = SignMessage + time;
+        const signature = await window.ethereum.request({
+            method: 'personal_sign',
+            params: [msg, myaddr]
+        });
+        document.getElementById("status1").style.color = "white";
+        document.getElementById("status1").innerText = "Hello, " + myaddr;
+        document.getElementById("status2").style.color = "green";
+        document.getElementById("status2").innerText = "Your " + network + " access token is: " + time + ":" + signature;
+
+        //var Addr=web3.eth.accounts.recover(msg, signature);
+        //console.log(Addr);
+
+
+
+        return;
+    }
+
+
     const options = (network === "google") ? {
         scope: 'email, https://www.googleapis.com/auth/user.phonenumbers.read'
     } : {
