@@ -27,6 +27,7 @@ We stress that `LoI` aims at offering both encryption and authentication/signatu
 
 ### Currently supported providers
 The current demo only offers encryption and supports the following providers: 
+
 	* `google`: associate to a user his/her email address set in his/her Google account.
 	* `facebook`: associate to a user his/her email address set in his/her Facebook account.
 	* `google.phone`: use Google as provider but associates to the users their profile phone numbers (when visible) rather than their email addresses. 
