@@ -24,7 +24,7 @@ const commander = require('commander');
 const dic = require('./dic/loi_server_dic');
 const loi_utils = require("./utils");
 const cts = require("./compute_token_share");
-const eth_provider = require("./eth_provider/eth");
+const eth_provider = require("./eth_provider/loi_server_dic");
 const bodyParser = require('body-parser');
 const fs = require('fs');
 commander
@@ -60,7 +60,7 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
         options.share = Msg;
         app.get('/:prov/:group/:date/:token/:friends/:anon/:ethereum', async (req, res) => {
             if (req.params.prov === "eth") {
-                eth_provider.loi_server(req, res, TIMEOUT_CHALLENGE, INFURA_API_KEY, SignMessage, options);
+                eth_provider.loi_server_eth(req, res, TIMEOUT_CHALLENGE, INFURA_API_KEY, SignMessage, options);
                 return;
             } else if (req.params.prov === "facebook" && req.params.friends === "null")
                 fetch('https://graph.facebook.com/v18.0/debug_token?input_token=' + req.params.token + '&access_token=' + FACEBOOK_CLIENT_ID + '|' + FACEBOOK_SECRET_ID)
