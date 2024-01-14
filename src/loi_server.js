@@ -8,6 +8,8 @@
 // This is not done in the current demo.
 
 // The file params.json contains configuration directive, in particular here we will use GOOGLE_CLIENT_ID, FACEBOOK_CLIENT_ID, GOOGLE_API_KEY and FACEBOOK_SECRET_ID
+// Note: The providers google, facebook, and google.phone are handled in this file while dic.* and eth are handled in separated files
+
 const hkdf = require("@noble/hashes/hkdf");
 const sha256 = require("@noble/hashes/sha256");
 const hashes = require("@noble/hashes/utils");
@@ -22,12 +24,9 @@ const commander = require('commander');
 const dic = require('./dic/loi_server_dic');
 const loi_utils = require("./utils");
 const cts = require("./compute_token_share");
+const eth_provider = require("./eth_provider/eth");
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const {
-    Web3
-} = require("web3");
-const network = process.env.ETHEREUM_NETWORK;
 commander
     .version('1.0.0', '-v, --version')
     .usage('-p <value> -s <value>')
@@ -57,66 +56,12 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
     const FACEBOOK_SECRET_ID = data.params.FACEBOOK_SECRET_ID;
     const INFURA_API_KEY = data.params.INFURA_API_KEY;
     const SignMessage = data.params.SignMessage;
-    const web3 = new Web3(
-        new Web3.providers.HttpProvider(INFURA_API_KEY, network),
-    );
     loi_utils.read(fs.createReadStream(options.share)).then(function(Msg) {
         options.share = Msg;
         app.get('/:prov/:group/:date/:token/:friends/:anon/:ethereum', async (req, res) => {
             if (req.params.prov === "eth") {
-                if (req.params.group === "1") {
-                    console.error("Token request with group param 1 for provider eth.");
-                    res.sendStatus(400);
-                    return;
-                }
-                const time = req.params.token.split(':')[0];
-                if (Math.floor(Date.now() / 1000) - time >= TIMEOUT_CHALLENGE) {
-                    console.error("Error. Expired token for provider eth.");
-                    res.sendStatus(400);
-                    return;
-
-                }
-                const signature = req.params.token.split(':')[1];
-                const msg = SignMessage + time;
-                const RecoveredAddr = web3.eth.accounts.recover(msg, signature);
-                web3.eth.getBalance(RecoveredAddr).then(function(wei) {
-                    if (wei === 0n) {
-                        console.error("Error. Invalid address or 0 balance.");
-                        res.sendStatus(400);
-                        return;
-
-                    }
-                    if (req.params.anon === "1") wei = 0n;
-                    const Email = wei + "@" + RecoveredAddr;
-                    console.log("Received request for email: " + Email + " for provider: " + req.params.prov + " and group flag: " + req.params.group + " and friends param: " + req.params.friends + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
-                    var year, month, curyear, curmnonth;
-                    const date = new Date();
-                    curyear = date.getFullYear();
-                    curmonth = date.getMonth();
-                    if (req.params.date !== "now") {
-                        year = req.params.date.split('.')[1];
-                        month = req.params.date.split('.')[0];
-                        if (year > curyear || month > curmonth) {
-                            console.error("Invalid token request received by client.");
-                            res.sendStatus(400);
-                            return;
-                        }
-                    } else {
-                        year = curyear;
-                        month = curmonth;
-                    }
-                    const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
-                    res.send(st);
-
-                }).catch(function(err) {
-                    console.error("Invalid token request received by client.");
-                    res.sendStatus(400);
-                    return;
-                });
-
-
-
-
+                eth_provider.loi_server(req, res, TIMEOUT_CHALLENGE, INFURA_API_KEY, SignMessage, options);
+                return;
             } else if (req.params.prov === "facebook" && req.params.friends === "null")
                 fetch('https://graph.facebook.com/v18.0/debug_token?input_token=' + req.params.token + '&access_token=' + FACEBOOK_CLIENT_ID + '|' + FACEBOOK_SECRET_ID)
                 .then(function(response) {
