@@ -31,7 +31,7 @@ The current demo only offers encryption and supports the following providers:
 * `facebook`: associate as identity the email address set in the user's Facebook account.
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
-* `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. In both cases (with `-anon` set or not set), the token is issued only if the address `addr` holds more than $0$ Wei.
+* `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. 
 
 ## Installation
 ### Installing the required packages
@@ -173,13 +173,14 @@ The commands `node sign.js` and `node verify.js` allow resp. to sign and verify 
 For group encryption/signatures  specify the `--group` option to the `get_token.js` command and specify the domain (e.g., `oldcrypto.com`) instead of a full email in the other commands.
 ### Additional options
 #### Anti-spam token
-With the `facebook` token you can specify the option `--friends X` (to all commands) to associate the token only to Facebook users with at least `X` number of friends. This may have applications as anti-spam tool in blockchains since it makes harder to create fake users.
+When using the `facebook` (resp. `eth`) provider you can specify the option `--friends X` (to all commands) to associate the token only to a Facebook user (resp. Ethereum address) with at least `X` number of friends (resp. with at least `X` Wei held by the address). This may have applications as anti-spam tool in blockchains since it makes harder to create fake users. In the case of the `eth` provider it can be also used to create e.g. the `DAO of wealthy Ethereum users`.
+
 #### Anonymity 
 With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
-For all providers different from `eth`, in this case for security the servers should check whether the access token has not been already used but this is not done in the current demo.
-For the provider `eth`, this option sets the identity to a string of the form `0@addr` where `addr` is an Ethereum address.
+If the provider is different from `eth`, for security the servers should check whether the access token has not been already used but this is not done in the current demo.
+For the provider `eth`, this option sets the identity equal to a string of the form `0@addr` where `addr` is an Ethereum address.
 
-Fpr all providers different from `eth`, this option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
+For all providers different from `eth`, this option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
 ## Digital Identity Cards
 The flow to use digital identity cards (`DICs`) is the following. The following example is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will adopt it).

@@ -16,7 +16,7 @@ function handleProviders(options, provider) {
 
 function handleOptionFriends(options, provider) {
     var opts;
-    if (provider === "facebook" && options.friends) opts = options.friends;
+    if ((provider === "facebook" || provider === "eth") && options.friends) opts = options.friends;
     else opts = "null";
     return opts;
 }

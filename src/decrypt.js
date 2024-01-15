@@ -24,7 +24,7 @@ commander
     .requiredOption('-c, --ciphertext <value>', 'the ciphertext.')
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
-    .option('-f, --friends <value>', 'for tokens granted only to users with at least <value> total counts of friends.')
+    .option('-f, --friends <value>', 'For \"facebook\" provider grant the token only to a user with at least <value> total counts of friends. For \"eth\" provider grant the token only to an Ethereum address with at least <value> of Wei held by the address.')
     .option('-om, --output_msg <value>', 'write the decrypted message to the file <value> instead of writing it to the stdout.')
     .option('-anon, --anonymous', 'for tokens granted through the \'--anonymous\' option.')
     .option('-cca2, --cca2', 'decrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security. The first byte of the decrypted message will be 0/1 to denote failure or success of decryption.')

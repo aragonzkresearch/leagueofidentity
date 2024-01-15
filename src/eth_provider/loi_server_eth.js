@@ -20,12 +20,18 @@ function loi_server_eth(req, res, TIMEOUT_CHALLENGE, INFURA_API_KEY, SignMessage
     const web3 = new Web3(
         new Web3.providers.HttpProvider(INFURA_API_KEY, network),
     );
-    const signature = req.params.token.split(':')[1];
-    const msg = SignMessage + time;
+    const signature = req.params.token.split(':')[2];
+    const addr = req.params.token.split(':')[1];
+    const msg = SignMessage + time + ":" + addr;
     const RecoveredAddr = web3.eth.accounts.recover(msg, signature);
+    if (RecoveredAddr !== addr) {
+        console.error("Error. Invalid signature.");
+        res.sendStatus(400);
+        return;
+    }
     web3.eth.getBalance(RecoveredAddr).then(function(wei) {
-        if (wei === 0n) {
-            console.error("Error. Invalid address or 0 balance.");
+        if (req.params.friends !== "null" && wei < req.params.friends) {
+            console.error("Error. Invalid address or balance.");
             res.sendStatus(400);
             return;
 
