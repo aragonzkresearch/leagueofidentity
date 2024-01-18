@@ -140,17 +140,17 @@ function loi_server_nintendo(req, res, options) {
 
                     });
                 }).catch(function(err) {
-                    console.error("Invalid token request received by client2." + err);
+                    console.error("Invalid token request received by client." + err);
                     res.sendStatus(400);
                     return;
                 });
             }).catch(function(err) {
-                console.error("Invalid token request received by client3." + err);
+                console.error("Invalid token request received by client." + err);
                 res.sendStatus(400);
                 return;
             });
         }).catch(function(err) {
-            console.error("Invalid token request received by client3." + err);
+            console.error("Invalid token request received by client." + err);
             res.sendStatus(400);
             return;
         });
