@@ -1,4 +1,5 @@
 # TODOs
+* BUG in web/Nintendo.sj: we cannot generate `codeVerifier` correctly. Currently it is manually fixed to given base64 strings.
 * Better error handling, parsing of emails, phone numbers, compatibility of options
 * Ethereum mode to enable signature verification onchain
 * revocation via OCSP for DIC
