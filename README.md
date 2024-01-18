@@ -33,6 +33,7 @@ The current demo only offers encryption and supports the following providers:
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
 * `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. 
 * `nintendo`: associate as identity the `id` of your `Nintendo` account. Thought it is not implemented yet, it is easy to add the following option: a `Nintendo` user is granted the token only if he/she participates in some specific `Nintendo Swithc Online` games (e.g., `Animal Crossing`) and also to restrict the token only to users with specific state/progress in the game.
+* `eth`: associate as identity a string of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. 
 
 ## Installation
 ### Installing the required packages
@@ -87,6 +88,9 @@ You can select `facebook` from the menu to get a `facebook` access token.  In th
 
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
+### Get an Ethereum access token
+For Ethereum the flow is identical except that you need to select `ethereum` from the menu and you will be asked to sign a message with your `Metamask`  account. No transaction will be submitted on-chain and no GAS cost will be paid.
+
 ### Compute the shares and run the `LoI` nodes
 Henceforth, we assume to be working in the folder `src`.
 `LoI` is associated to two parameters: `n`, the number of nodes in the network, and `t`, the threshold of nodes who can reconstruct the secrets and break the security.
