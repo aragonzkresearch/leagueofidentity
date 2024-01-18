@@ -25,6 +25,7 @@ const dic = require('./dic/loi_server_dic');
 const loi_utils = require("./utils");
 const cts = require("./compute_token_share");
 const eth_provider = require("./eth_provider/loi_server_eth");
+const nintendo_provider = require("./nintendo_provider/loi_server_nintendo");
 const bodyParser = require('body-parser');
 const fs = require('fs');
 commander
@@ -59,7 +60,10 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
     loi_utils.read(fs.createReadStream(options.share)).then(function(Msg) {
         options.share = Msg;
         app.get('/:prov/:group/:date/:token/:friends/:anon/:ethereum', async (req, res) => {
-            if (req.params.prov === "eth") {
+            if (req.params.prov === "nintendo") {
+                nintendo_provider.loi_server_nintendo(req, res, options);
+                return;
+            } else if (req.params.prov === "eth") {
                 eth_provider.loi_server_eth(req, res, TIMEOUT_CHALLENGE, INFURA_API_KEY, SignMessage, options);
                 return;
             } else if (req.params.prov === "facebook" && req.params.friends === "null")

@@ -8,6 +8,7 @@ const mod = require("@noble/curves/abstract/modular");
 const fetch = require("node-fetch");
 const commander = require('commander');
 const loi_utils = require("./utils");
+const nintendo = require("./nintendo_session_token_code");
 const eth = require("./ethereum_mode");
 const request = require("request");
 const dic = require("./dic/loi_server_dic");
@@ -25,7 +26,7 @@ commander
     .requiredOption('-l, --list <value...>', 'list of t values of the form i_1 server_1:port_1 ... i_t server_t:port_t, where t is the given threshold specified by the -t argument and each index i_1, ..., i_t is an integer between 1 and n, where n is the value specified by the -n argument.')
     .option('-m, --month <value>', 'a value of the form month.year (XX.YYYY), where month is a value between 0 and 11. If not specified it defaults to the current month.year.')
     .option('-g, --group', 'request a group token.')
-    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\"). Default is \"google\".')
+    .option('-P, --provider <value>', 'provider (\"google\", \"facebook\", \"google.phone\", \"dic.it\", \"eth\", \"nintendo\"). Default is \"google\".')
     .option('-ok, --output_key <value>', 'write the master public key to the file <value> instead of writing it to stdout.')
     .option('-ot, --output_token <value>', 'write the token to the file <value> instead of writing it to stdout.')
     .option('-f, --friends <value>', 'For \"facebook\" provider grant the token only to a user with at least <value> total counts of friends. For \"eth\" provider grant the token only to an Ethereum address with at least <value> of Wei held by the address.')
@@ -77,7 +78,7 @@ for (let i = 0; i < options.threshold; i++) {
     Addresses[i] = options.list[i * 2 + 1];
 }
 const group = !options.group ? "0" : "1";
-if (group === "1" && (provider === 'google.phone' || provider === 'eth' || loi_utils.prov_is_dic(provider))) {
+if (group === "1" && (provider === 'google.phone' || provider === 'eth' || provider === "nintendo" || loi_utils.prov_is_dic(provider))) {
     console.error("Option -g is not compatible with provider " + provider + ".");
     process.exit(1);
 
@@ -122,6 +123,8 @@ const fetch_anon = loi_utils.handleOptionAnon(options, provider);
 const fetch_age = options.age ? options.age : "null";
 const fetch_cross_country = options.cross_country ? "1" : "null";
 const fetch_ethereum = options.ethereum ? "1" : "null";
+if (provider === "nintendo") options.access_token = nintendo.nintendo_session_token_code(options.access_token);
+
 var bg;
 if (fetch_ethereum === "null") bg = require('@noble/curves/bls12-381').bls12_381;
 else bg = require('@noble/curves/bn254').bn254;

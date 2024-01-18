@@ -6,8 +6,8 @@ function xor(hex1, hex2) {
 }
 
 function handleProviders(options, provider) {
-    if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone" && options.provider !== 'dic.it' && options.provider !== 'eth') {
-        console.error("Supported providers: google, facebook, google.phone, eth, dic.it.");
+    if (options.provider && options.provider !== "google" && options.provider !== "facebook" && options.provider !== "google.phone" && options.provider !== 'dic.it' && options.provider !== 'eth' && options.provider !== 'nintendo') {
+        console.error("Supported providers: google, facebook, google.phone, eth, dic.it, nintendo.");
         process.exit(1);
     } else if (!options.provider) provider = "google";
     else provider = options.provider;
@@ -23,7 +23,7 @@ function handleOptionFriends(options, provider) {
 
 function handleOptionAnon(options, provider) {
     var opts;
-    if (provider !== "google.phone" && options.anonymous) opts = "1";
+    if (provider != "nintendo" && provider !== "google.phone" && options.anonymous) opts = "1";
     else opts = "0";
     return opts;
 }

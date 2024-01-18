@@ -4,6 +4,8 @@ const web3 = new Web3(window.ethereum);
 var flag = 0;
 const SignMessage = "Do not sign this message in any application different than League of Identity. The signature will be used to authenticate to the League of Identity network. Params:"; // CONVENTION: this message should NOT contain any character ':' because this message is concatenated with other info and we use ':' to split the message.
 
+
+
 async function checkMetaMaskAvailability() {
     if (window.ethereum) {
         try {
@@ -57,9 +59,33 @@ hello.init({
     google: GOOGLE_CLIENT_ID,
     facebook: FB_CLIENT_ID
 });
+
+
+
 document.getElementById("accountbutton").addEventListener("click", async () => {
     const network = document.getElementById("menu").value;
-    if (network === "ethereum") {
+    if (network === "nintendo") {
+        if (await swal("You will be redirected to a Nintendo Switch Online (NSO) page. Log into it using your NSO credentials.\nYou will land to some page displaying a button \"select this person\".\nRight click on it and copy the link.\nCopy the link into the  clipboard and paste it in this window.", {
+                icon: "warning",
+            })) {
+            Nintendo().then(function(nst) {
+                window.open(nst.split('@')[1], "_blank");
+                document.getElementById("status1").style.color = "white";
+                document.getElementById("status1").innerText = "Hello, Nintendo Gamer";
+                document.getElementById("status2").style.color = "green";
+                document.getElementById("status2").innerText = "You have been be redirected to a Nintendo Switch Online (NSO) page. Log into it using your NSO credentials.\nYou will land to some page displaying a button \"select this person\".\nRight click on it and copy the link.\nCopy the link into the  clipboard and paste it in this window.";
+                document.body.addEventListener('keydown', async function(e) {
+                    if (e.key === 'v' && e.ctrlKey) {
+                        document.getElementById("status1").style.color = "white";
+                        document.getElementById("status1").innerText = "Hello, Nintendo Gamer";
+                        document.getElementById("status2").style.color = "green";
+                        document.getElementById("status2").innerText = "Your " + network + " access token is " + nst.split('@')[0] + "@" + await navigator.clipboard.readText();
+                    }
+                });
+            });
+        }
+        return;
+    } else if (network === "ethereum") {
         if (flag === 0 && checkMetaMaskAvailability() === false) return;
 
         const accounts = await web3.eth.getAccounts();
