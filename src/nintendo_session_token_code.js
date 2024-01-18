@@ -8,7 +8,7 @@ function nintendo_session_token_code(nst_code) {
             const splitStr = str.split('=');
             params[splitStr[0]] = splitStr[1];
         });
-    return  codeVerifier + "@" + params.session_token_code;
+    return codeVerifier + "@" + params.session_token_code;
 }
 
 module.exports = {
