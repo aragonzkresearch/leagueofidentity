@@ -32,6 +32,7 @@ The current demo only offers encryption and supports the following providers:
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
 * `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. 
+* `nintendo`: associate as identity the `id` of your `Nintendo` account. Thought it is not implemented yet, it is easy to add the following option: a `Nintendo` user is granted the token only if he/she participates in some specific `Nintendo Swithc Online` games (e.g., `Animal Crossing`) and also to restrict the token only to users with specific state/progress in the game.
 
 ## Installation
 ### Installing the required packages
@@ -41,7 +42,7 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a stand-alone version is embedded in the `web` folder.
-For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser, web3` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser, web3, request-promise-native` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
@@ -54,6 +55,7 @@ npm install --save fs
 npm install --save shelljs
 npm install --save body-parser
 npm install --save web3
+npm install --save request-promise-native
 npm install --save @noble-curves@1.2.0
 ```
 Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
@@ -62,7 +64,8 @@ Note that for `noble-curves` we stick to the version `1.2.0` we used for the tes
 It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to use the demo for the provider `google` even without that.
 Instead, for the provider `facebook` you need a pair of `client id` and `secret id` to fill the parameters resp. `FACEBOOK_CLIENT_ID` and `FACEBOOK_SECRET_ID` in the file `src/params.json`.
 For `google.phone` you need to fill the value `GOOGLE_API_KEY` in the same file with a Google API Key. 
-For `eth` you need to fill the value `INFURA_API_KEY` in the same file with an Infura API Key. 
+For `eth` you need to fill the value `INFURA_API_KEY` in the same file with an Infura API Key.  
+For `Nintendo` you do not need any parameters or secrets but you should guarantee that the value `nsoVersion` in the `src/params.json` file equals the most recent `Nintendo Switch Online` version (e.g. `2.8.1` at time of writing).
 
 Once you configured the parameters in `params.json`, you need to run a web server on the port `5000`, for instance:
 ```bash
@@ -179,8 +182,9 @@ When using the `facebook` (resp. `eth`) provider you can specify the option `--f
 With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
 If the provider is different from `eth`, for security the servers should check whether the access token has not been already used but this is not done in the current demo.
 For the provider `eth`, this option sets the identity equal to a string of the form `0@addr` where `addr` is an Ethereum address.
+This option is not compatible with the provider `nintendo`.
 
-For all providers different from `eth`, this option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
+For all providers different from `eth` and `nintendo`, this option is compatible with the option `--group`; in such case you need to specify identities of the form `AT@domain` to the argument `-e` of the `encrypt.js, decrypt.js, sign.js, verify.js` commands, where `AT` is the access token specified to the `-A` argument of the `get_token.js` command.
 
 ## Digital Identity Cards
 The flow to use digital identity cards (`DICs`) is the following. The following example is for the Italian `DIC` but we will later show how to generalize it to virtually any `DIC` that supports signing documents (not all `DIC` do support signing but in the near future many countries will adopt it).
