@@ -79,7 +79,7 @@ for (let i = 0; i < options.threshold; i++) {
 }
 const group = !options.group ? "0" : "1";
 if (group === "1" && (provider === 'google.phone' || provider === 'eth' || provider === "nintendo" || loi_utils.prov_is_dic(provider))) {
-    console.error("Option -g is not compatible with provider " + provider + ".");
+    console.error("Option --group is not compatible with provider " + provider + ".");
     process.exit(1);
 
 }
@@ -97,11 +97,19 @@ if (Month !== "now") {
     month = Month.split('.')[0];
     year = Month.split('.')[1];
 } else date_path = "now";
+
 var t = options.threshold;
+
 if (options.friends && provider !== "eth" && provider !== "facebook") {
     console.error("Option --friends compatibile only with providers \"facebook\", \"eth\" but request is for provider: " + provider);
     process.exit(1);
 }
+
+if (options.anonymous && provider === "nintendo") {
+    console.error("Option --anonymous not compatibile with provider \"nintendo\" but request is for provider: " + provider);
+    process.exit(1);
+}
+
 var signed_file = '';
 var stream = '';
 if (options.signature) {

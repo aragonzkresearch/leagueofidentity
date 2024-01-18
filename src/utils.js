@@ -23,7 +23,7 @@ function handleOptionFriends(options, provider) {
 
 function handleOptionAnon(options, provider) {
     var opts;
-    if (provider != "nintendo" && provider !== "google.phone" && options.anonymous) opts = "1";
+    if (provider !== "nintendo" && provider !== "google.phone" && options.anonymous) opts = "1";
     else opts = "0";
     return opts;
 }
