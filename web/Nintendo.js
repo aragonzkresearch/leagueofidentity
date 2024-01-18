@@ -1,5 +1,5 @@
 function generateRandom(length) {
-    return btoa(crypto.getRandomValues(new Uint8Array(length)));
+    return btoa(String.fromCodePoint(...crypto.getRandomValues(new Uint8Array(length)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=*$/g, '');
 }
 
 function calculateChallenge(codeVerifier) {
@@ -24,7 +24,7 @@ function generateAuthenticationParams() {
     var codeVerifier = generateRandom(32);
     //    state="aXKcCepajRYidshmMOyuK4Fh_N2jzDsw1QM-cwK5fCW_YZ7G"; // use it for debug
     //codeVerifier="S_osxJeP2y9G6ySkkrUoancYztkdrPzi_edBY12Dt9U"; // use it for debug
-    codeVerifier = "P_osxJeP2y9G6ySkkrUoancYztkdrPzi_edBY12Dt9U"; // use it for debug
+    // codeVerifier = "P_osxJeP2y9G6ySkkrUoancYztkdrPzi_edBY12Dt9U"; // use it for debug
     const codeChallenge = crypto.subtle.digest("SHA-256", new TextEncoder("utf-8").encode(codeVerifier)).then(function(digest) {
         return bytesToBase64DataUrl(digest);
     });
