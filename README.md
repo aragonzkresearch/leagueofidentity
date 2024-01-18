@@ -85,6 +85,8 @@ Copy the so obtained ``access token`` in your clipboard. Note that it has a vali
 In this example I computed the token for my email ``vinciovino@gmail.com``.
 You can select `facebook` from the menu to get a `facebook` access token.  In the case of facebook the users will be associated to the email addresses specified in their personal profiles.
 
+For `Nintendo` the flow is the following. Select `facebook` and click on ``Get access Token``, you will be redirected to a `Nintendo` login page. Input your credentials and you will land to a page with a button ``select this person``. Right click on this button and copy the link. Return to the `LoI` webpage and paste it. The `access token`` will be shown in the console.
+
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
 ### Get an Ethereum access token
