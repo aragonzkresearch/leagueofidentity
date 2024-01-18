@@ -76,7 +76,7 @@ python3 -m http.server 5000
 We used the port `5000` because the file `main.js` that implements the web page embeds a `Google client id` associated with domain `localhost:5000` so changing port will not work with the `client id` we provided. It is strongly suggested that you create a Google developer account and setup your own project and get your own `client id`. Search the line containing the comment ``// client id`` in ``web/main.js`` and replace the corresponding value with your own `client id` . Similarly, for Facebook. 
 ## How to Use `LoI` modules
 ### Get a Google or Facebook access token
-Open the link ``localhost:5000`` in your browser, and click on ``Get access Token``, you should get some view like the following:
+Open the link ``localhost:5000`` in your browser, and click on ``Get access token``, you should get some view like the following:
 <br>
 <img src="screenshot1loi.png" width="100%" height="100%" />
 <br>
@@ -85,7 +85,7 @@ Copy the so obtained ``access token`` in your clipboard. Note that it has a vali
 In this example I computed the token for my email ``vinciovino@gmail.com``.
 You can select `facebook` from the menu to get a `facebook` access token.  In the case of facebook the users will be associated to the email addresses specified in their personal profiles.
 
-For `Nintendo` the flow is the following. Select `facebook` and click on ``Get access Token``, you will be redirected to a `Nintendo` login page. Input your credentials and you will land to a page with a button ``select this person``. Right click on this button and copy the link. Return to the `LoI` webpage and paste it. The `access token`` will be shown in the console.
+For `Nintendo` the flow is the following. Select `facebook` and click on ``Get access token``, you will be redirected to a `Nintendo` login page. Input your credentials and you will land to a page with a button ``select this person``. Right click on this button and copy the link. Return to the `LoI` webpage and paste it. The `access token`` will be shown in the console.
 
 Observe that in our example we are using a `http` website without `TLS`.
 This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
