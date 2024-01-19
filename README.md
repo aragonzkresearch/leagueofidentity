@@ -84,11 +84,14 @@ Open the link ``localhost:5000`` in your browser, and click on ``Get access toke
 Copy the so obtained ``access token`` in your clipboard. Note that it has a validity of 1hour. We assume henceforth that the variable ``access_token`` contains the text you previously copied to your clipboard.
 In this example I computed the token for my email ``vinciovino@gmail.com``.
 You can select `facebook` from the menu to get a `facebook` access token.  In the case of facebook the users will be associated to the email addresses specified in their personal profiles.
+Observe that in our example we are using a `http` website without `TLS`.
+This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
+### Get a Nintendo access token
 
 For `Nintendo` the flow is the following. Select `facebook` and click on ``Get access token``, you will be redirected to a `Nintendo` login page. Input your credentials and you will land to a page with a button ``select this person``. Right click on this button and copy the link. Return to the `LoI` webpage and paste it. The `access token`` will be shown in the console.
 
-Observe that in our example we are using a `http` website without `TLS`.
-This is only for simplicity. However, be aware that, since we are in the setting of `OAuth implicit flow`, using non-secure connections could make your application insecure.
+Note: though we still call the so obtained object access token, this is actually a session token code in the Nintendo API terminology. We keep the name access token for uniformity.
+
 ### Get an Ethereum access token
 For Ethereum the flow is identical except that you need to select `ethereum` from the menu and you will be asked to sign a message with your `Metamask`  account. No transaction will be submitted on-chain and no GAS cost will be paid.
 
