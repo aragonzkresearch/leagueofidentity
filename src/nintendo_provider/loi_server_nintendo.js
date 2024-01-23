@@ -1,6 +1,8 @@
 // DISCLAIMER: 
 // Do NOT use the `Nintendo` provider in any real world application outside your local computer. The demo in this repository is meant to be just a proof of feasibility about the *possibility* of implementing such mechanism for `Nintendo` *in the future*. Indeed, the current demo uses APIs that are not documented and might be insecure and not used properly. To deploy a `LoI` system with a `Nintendo` provider, `Nintendo` should be contacted and some efficient and secure APIs should be agreed and implemented by `Nintendo` and the `LoI` system should be adapted to them. 
-// Most of this implementation is quite lame and was done just as example of 'gaming features' doable with LoI. As an example the session token should never be sent to the nodes like it is done in this file...
+// Most of this implementation is quite lame and was done just as example of 'gaming features' doable with LoI. As an example the session token should never be sent to the nodes like it is done in this file. Part of this code should done in the web interface and this LoI module should only receive the ApiToken.access_token (but not ApiToken.id_token) needed to retriev userinfo. Even with these changes it might not be reliable and secure and should be allowed, checked and agreed with Nintendo.
+// We discourage any use outside your local computer!!!
+
 const fs = require('fs');
 const request2 = require('request-promise-native');
 const loi_utils = require('../utils');
@@ -58,7 +60,7 @@ async function getApiToken(Session_Token, nsoVersion, userAgentString) {
         }
     });
     return {
-        id: resp.id_token,
+        // id: resp.id_token,
         access: resp.access_token
     };
 }
@@ -79,7 +81,7 @@ async function getUserInfo(token, nsoVersion, userAgentString) {
 
     return {
         id: response.id,
-        emailVerified: response.emailVerified
+        //emailVerified: response.emailVerified
     };
 }
 

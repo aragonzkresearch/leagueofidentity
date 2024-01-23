@@ -1,5 +1,7 @@
 // DISCLAIMER: 
 // Do NOT use the `Nintendo` provider in any real world application outside your local computer. The demo in this repository is meant to be just a proof of feasibility about the *possibility* of implementing such mechanism for `Nintendo` *in the future*. Indeed, the current demo uses APIs that are not documented and might be insecure and not used properly. To deploy a `LoI` system with a `Nintendo` provider, `Nintendo` should be contacted and some efficient and secure APIs should be agreed and implemented by `Nintendo` and the `LoI` system should be adapted to them. 
+// See comments in the file ../src/nintendo_provider/loi_server_nintendo.js
+// We discourage any use outside your local computer!!!
 
 const CLIENT_ID = '71b963c1b7b6d119';
 
