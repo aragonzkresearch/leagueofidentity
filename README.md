@@ -32,7 +32,10 @@ The current demo only offers encryption and supports the following providers:
 * `google.phone`: use Google as provider but associates as identity the phone number (when visible) set in the user's Google profile rather than the user's email address. 
 * `dic.it`: the provider `dic.it` is for Italian digital identity cards (tested on v3.0). It can associate as identity the social security number of the citizen or other info depending on the options (see [below](https://github.com/aragonzkresearch/leagueofidentity/tree/master#digital-identity-cards)).
 * `eth`: associate as identity an identity of the form `wei@addr` where `addr` is an Ethereum address and `wei` is the amount of Wei owned by the given adddress `addr`. With the option `-anon` the token will be instead associated to the identity `0@addr`, that is anonymyzing the quantity of Wei held by `addr`. 
-* `nintendo`: associate as identity the `id` of your `Nintendo` account. Thought it is not implemented yet, it will be easy to add the following option: a `Nintendo` gamer is granted the token only if he/she participates in a given `Nintendo Switch Online` game (e.g., `Animal Crossing`) and also to restrict the token only to gamers with specific state/progress in the game.
+* `nintendo`: associate as identity the `id` of your `Nintendo` account. Thought it is not implemented yet, it will be easy to add the following option: a `Nintendo` gamer is granted the token only if he/she participates in a given `Nintendo Switch Online` game (e.g., `Animal Crossing`) and also to restrict the token only to gamers with specific state/progress in the game. 
+
+### Disclaimer about the `Nintendo` provider
+Do NOT use the `Nintendo` provider in any real world application outside your local computer. The demo in this repository is meant to be just a proof of feasibility about the *possibility* of implementing such mechanism for `Nintendo` *in the future*. Indeed, the current demo uses APIs that are not documented and might be insecure and not used properly. To deploy a `LoI` system with a `Nintendo` provider, `Nintendo` should be contacted and some efficient and secure APIs should be agreed and implemented by `Nintendo` and the `LoI` system should be adapted to them. 
 
 ## Installation
 ### Installing the required packages
