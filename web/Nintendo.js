@@ -1,7 +1,8 @@
 // DISCLAIMER: 
 // Do NOT use the `Nintendo` provider in any real world application outside your local computer. The demo in this repository is meant to be just a proof of feasibility about the *possibility* of implementing such mechanism for `Nintendo` *in the future*. Indeed, the current demo uses APIs that are not documented and might be insecure and not used properly. To deploy a `LoI` system with a `Nintendo` provider, `Nintendo` should be contacted and some efficient and secure APIs should be agreed and implemented by `Nintendo` and the `LoI` system should be adapted to them. 
 
-const fs = require('fs');
+const CLIENT_ID = '71b963c1b7b6d119';
+
 function generateRandom(length) {
     return btoa(String.fromCodePoint(...crypto.getRandomValues(new Uint8Array(length)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=*$/g, '');
 }
@@ -47,8 +48,9 @@ function Nintendo() {
         codeChallenge = codeChallenge.split(',')[1].replace(/\+/g, '-').replace(/\//g, '_').replace(/=*$/g, '');
         const params = {
             state: authParams.state,
-            redirect_uri: 'npf71b963c1b7b6d119://auth&client_id=71b963c1b7b6d119',
-            scope: 'openid%20user%20user.birthday%20user.mii%20user.screenName',
+            redirect_uri: 'npf' + CLIENT_ID + '://auth&client_id=' + CLIENT_ID,
+            //scope: 'openid%20user%20user.birthday%20user.mii%20user.screenName',
+            scope: 'openid',
             response_type: 'session_token_code',
             session_token_code_challenge: codeChallenge,
             session_token_code_challenge_method: 'S256',
