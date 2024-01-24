@@ -250,7 +250,7 @@ However, a `DIC` does often store another certificate signed with the citizen's 
 Therefore, it should be possible to extend the current demo to have the user to send this additional certificate in order to get a token corresponding e.g. to a given town.
 
 ## TODOs
-* As explained (here)[https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view#Threshold-security-even-against-providers] one can define a token based on e.g. the intersection of Google and Facebook providers. In this way, Google or Facebook alone could not compute tokens on behalf of users. It would be a nice feature to be added.
+* As explained [here](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view#Threshold-security-even-against-providers) one can define a token based on e.g. the intersection of Google and Facebook providers. In this way, Google or Facebook alone could not compute tokens on behalf of users. It would be a nice feature to be added.
 
 ## References
 Vincenzo Iovino, Aragon ZK Research. [League of Identity: distributed identity-based encryption and authentication from Google and other providers](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view), 2023.
