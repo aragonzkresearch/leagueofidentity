@@ -55,6 +55,41 @@ function getYear(options) {
     return date.getFullYear();
 }
 
+function pad(s) {
+    var n = 64 - s.length;
+    for (let i = 0; i < n; i++) s = "0" + s;
+    return s;
+}
+
+function padOdd(s) {
+    if (s.length % 2 === 1) return "0" + s;
+}
+
+function handleDate(reqDate) {
+    var y, m, curyear, curmnonth;
+    const date = new Date();
+    curyear = date.getFullYear();
+    curmonth = date.getMonth();
+    if (reqDate !== "now") {
+        y = reqDate.split('.')[1];
+        m = reqDate.split('.')[0];
+        if (isNaN(parseInt(y)) || isNaN(parseInt(m)) || y < 0 || m < 0 || m > 11 || y < 2023) return "null";
+        m = m - 1; // we remove trailings 0s or + symbols. for example if m is "01" after this sequence of two instructions m will be "1".
+        m = m + 1;
+        y = y - 1;
+        y = y + 1;
+        if (y > curyear || (y == curyear && m > curmonth)) return "null";
+        return {
+            year: y,
+            month: m
+        };
+    } else return {
+        year: curyear,
+        month: curmonth
+    };
+}
+
+
 module.exports = {
     xor,
     handleProviders,
@@ -65,4 +100,7 @@ module.exports = {
     read,
     prov_is_dic,
     dic_country,
+    pad,
+    padOdd,
+    handleDate,
 };

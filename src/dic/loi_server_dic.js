@@ -64,22 +64,18 @@ function loi_server_post_it(options, req, res) { // for Italian DIC
                     }
 
 
-                    var year, month, curyear, curmnonth;
-                    const date = new Date();
-                    curyear = date.getFullYear();
-                    curmonth = date.getMonth();
-                    if (req.params.date !== "now") {
-                        year = req.params.date.split('.')[1];
-                        month = req.params.date.split('.')[0];
-                        if (year > curyear || month > curmonth) {
-                            console.error("Invalid token request received by client.");
-                            res.send("ERROR");
-                            return;
-                        }
+                    var year, month;
+                    const date = loi_utils.handleDate(req.params.date);
+
+                    if (date === 'null') {
+                        console.error("Invalid token request received by client.");
+                        res.sendStatus(400);
+                        return;
                     } else {
-                        year = curyear;
-                        month = curmonth;
+                        year = date.year;
+                        month = date.month;
                     }
+
                     var st;
                     if (req.params.cross_country !== "null") req.params.country = "";
                     else req.params.country = "." + req.params.country;

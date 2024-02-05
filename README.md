@@ -9,7 +9,10 @@ The token can be used for the following functionalities.
 * Encryption. Bob can use the `MPK` of `LoI` to encrypt a message associated to `alice@gmail.com` and a given month and can publish the resulting ciphertext on a blockchain or send it directly to Alice. 
 Alice can use the previously obtained `token` to decrypt the ciphertext received by Bob and recover the secret message.
 We remark that the `token` is different from the `access token`.
-	- Group encryption. Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Business domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`.
+	- Group encryption. Similarly, the token can be associated to a group. For instance, if Alice belongs to the company `oldcrypto` the token can be associated to the domain `@oldcrypto.com` and anyone can send encrypted messages to all members of such company. Specifically, if for instance `@oldcrypto.com` is a Google Business domain, Alice and Bob, belonging to the company, can log into their Google accounts and get tokens to decrypt ciphertexts associated to `@oldcrypto.com`. 
+
+See [here](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view#Polish-BLIK-for-web3) for other examples of applications of identity-based encryption in web3.
+
 * Signatures. The token can be used by Alice to sign transactions over blockchains (e.g. `Cosmos` ones) so that one can form a `Decentralized Autonomous Organization` (`DAO`) based on specific rules.
 Consider the following applications scenarios:
 	- The `DAO` of `@oldcrypto.com` can be created in the obvious way by issuing corresponding `tokens` to users of Gmail accounts with domain `@oldcrypto`. 
@@ -22,7 +25,7 @@ Consider the following applications scenarios:
 Moreover we envision the signature to satisfy the following property:
 * Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verifying such signatures on Ethereum would consume too much GAS. Instead, the `LoI` signatures for digital identity cards should be efficiently verifiable in Ethereum and other blockchains.
 
-We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them.
+We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them. Encryption+signatures allow powerful applications, for instance a DAO of `@oldcrypto.com` can have encrypted proposals readable only by its members.
 
 
 ### Currently supported providers
@@ -190,7 +193,7 @@ For group encryption/signatures  specify the `--group` option to the `get_token.
 When using the `facebook` (resp. `eth`) provider you can specify the option `--friends X` (to all commands) to associate the token only to a Facebook user (resp. Ethereum address) with at least `X` number of friends (resp. with at least `X` Wei held by the address). This may have applications as anti-spam tool in blockchains since it makes harder to create fake users. In the case of the `eth` provider it can be also used to create e.g. the `DAO of wealthy Ethereum users`.
 
 #### Anonymity 
-With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the access token string specified to the argument `-A`; in such case you need to specify the access token string to the argument `-e` of all other commands.
+With the option `-anonymous` to `get_token.js` it is possible to request a token associated to an identity equal to the hex string representing the hash of the access token string specified to the argument `-A`; in such case you need to specify this string derived from the access token string to the argument `-e` of all other commands.
 If the provider is different from `eth`, for security the servers should check whether the access token has not been already used but this is not done in the current demo.
 For the provider `eth`, this option sets the identity equal to a string of the form `0@addr` where `addr` is an Ethereum address.
 This option is not compatible with the provider `nintendo`.
@@ -248,6 +251,9 @@ If the options `--cross_country` is set, the token is set to to a generic value 
 Unfortunately, `DICs` do not usually contain info like the Town of residency of the citizen.
 However, a `DIC` does often store another certificate signed with the citizen's certificate that in turn does contain additional information like the town, street, etc. of residency of the citizen.
 Therefore, it should be possible to extend the current demo to have the user to send this additional certificate in order to get a token corresponding e.g. to a given town.
+
+### Smart contracts
+See [here](https://github.com/vincenzoiovino/LoI.SmartContracts) for examples of smart contracts using LoI.
 
 ## TODOs
 * As explained [here](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view#Threshold-security-even-against-providers) one can define a token based on e.g. the intersection of Google and Facebook providers. In this way, Google or Facebook alone could not compute tokens on behalf of users. It would be a nice feature to be added.

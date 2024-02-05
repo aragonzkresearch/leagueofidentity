@@ -82,22 +82,18 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
 
                         }
                         if (text.data && text.data.is_valid && text.data.is_valid === true) {
-                            var year, month, curyear, curmnonth;
-                            const date = new Date();
-                            curyear = date.getFullYear();
-                            curmonth = date.getMonth();
-                            if (req.params.date !== "now") {
-                                year = req.params.date.split('.')[1];
-                                month = req.params.date.split('.')[0];
-                                if (year > curyear || month > curmonth) {
-                                    console.error("Invalid token request received by client.");
-                                    res.sendStatus(400);
-                                    return;
-                                }
+                            var year, month;
+                            const date = loi_utils.handleDate(req.params.date);
+
+                            if (date === 'null') {
+                                console.error("Invalid token request received by client.");
+                                res.sendStatus(400);
+                                return;
                             } else {
-                                year = curyear;
-                                month = curmonth;
+                                year = date.year;
+                                month = date.month;
                             }
+
                             fetch('https://graph.facebook.com/v18.0/me?fields=email&access_token=' + req.params.token).then(function(response2) {
                                 response2.json().then(function(text2) {
                                     if (!text2.email) {
@@ -108,10 +104,14 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
                                     }
                                     console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov + " and group flag: " + req.params.group + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
                                     var Email = text2.email;
-                                    if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
-                                    else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text2.email.split('@')[1];
+                                    if (req.params.anon === "1" && req.params.group === "0") Email = utils.bytesToHex(sha256.sha56(req.params.token));
+                                    else if (req.params.anon === "1" && req.params.group === "1") Email = utils.bytesToHex(sha256.sha256(req.params.token)) + "@" + text2.email.split('@')[1];
                                     const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
-                                    res.send(st);
+                                    if (req.params.ethereum === 'null')
+                                        res.send(st);
+                                    else st.then(function(ShareToken) {
+                                        res.send(ShareToken);
+                                    });
                                 }).catch((err) => {
                                     console.error("Invalid token request received by client.");
                                     res.sendStatus(400);
@@ -153,22 +153,18 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
 
                         }
                         if (text.data && text.data.is_valid && text.data.is_valid === true) {
-                            var year, month, curyear, curmnonth;
-                            const date = new Date();
-                            curyear = date.getFullYear();
-                            curmonth = date.getMonth();
-                            if (req.params.date !== "now") {
-                                year = req.params.date.split('.')[1];
-                                month = req.params.date.split('.')[0];
-                                if (year > curyear || month > curmonth) {
-                                    console.error("Invalid token request received by client.");
-                                    res.sendStatus(400);
-                                    return;
-                                }
+                            var year, month;
+                            const date = loi_utils.handleDate(req.params.date);
+
+                            if (date === 'null') {
+                                console.error("Invalid token request received by client.");
+                                res.sendStatus(400);
+                                return;
                             } else {
-                                year = curyear;
-                                month = curmonth;
+                                year = date.year;
+                                month = date.month;
                             }
+
                             fetch('https://graph.facebook.com/v18.0/me?fields=email&access_token=' + req.params.token).then(function(response2) {
                                 response2.json().then(function(text2) {
                                     if (!text2.email) {
@@ -187,10 +183,14 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
                                             }
                                             console.log("Received request for email: " + text2.email + " for provider: " + req.params.prov + " and group flag: " + req.params.group + " and friends param: " + req.params.friends + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
                                             var Email = text2.email;
-                                            if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
-                                            else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text2.email.split('@')[1];
+                                            if (req.params.anon === "1" && req.params.group === "0") Email = utils.bytesToHex(sha256.sha256(req.params.token));
+                                            else if (req.params.anon === "1" && req.params.group === "1") Email = utils.bytesToHex(sha256.sha256(req.params.token)) + "@" + text2.email.split('@')[1];
                                             const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
-                                            res.send(st);
+                                            if (req.params.ethereum === 'null')
+                                                res.send(st);
+                                            else st.then(function(ShareToken) {
+                                                res.send(ShareToken);
+                                            });
                                         }).catch((err) => {
                                             console.error("Invalid token request received by client.");
                                             res.sendStatus(400);
@@ -242,22 +242,18 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
 
                         }
                         if (text.email_verified && text.email_verified === 'true') {
-                            var year, month, curyear, curmnonth;
-                            const date = new Date();
-                            curyear = date.getFullYear();
-                            curmonth = date.getMonth();
-                            if (req.params.date !== "now") {
-                                year = req.params.date.split('.')[1];
-                                month = req.params.date.split('.')[0];
-                                if (year > curyear || month > curmonth) {
-                                    console.error("Invalid token request received by client.");
-                                    res.sendStatus(400);
-                                    return;
-                                }
+                            var year, month;
+                            const date = loi_utils.handleDate(req.params.date);
+
+                            if (date === 'null') {
+                                console.error("Invalid token request received by client.");
+                                res.sendStatus(400);
+                                return;
                             } else {
-                                year = curyear;
-                                month = curmonth;
+                                year = date.year;
+                                month = date.month;
                             }
+
                             fetch('https://people.googleapis.com/v1/people/' + text.sub + '?personFields=phoneNumbers&key=' + GOOGLE_API_KEY + '&access_token=' + req.params.token).then(function(response2) {
                                 if (!response2.ok) {
                                     console.error("Error. Response status: " + response.status);
@@ -267,9 +263,13 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
                                 response2.json().then(function(text2) {
                                     console.log("Received request for phone number: " + text2.phoneNumbers[0].canonicalForm + " for provider: " + req.params.prov + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
                                     var Email = text2.phoneNumbers[0].canonicalForm;
-                                    if (req.params.anon === "1") Email = req.params.token;
+                                    if (req.params.anon === "1") Email = utils.bytesToHex(sha256.sha256(req.params.token));
                                     const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
-                                    res.send(st);
+                                    if (req.params.ethereum === 'null')
+                                        res.send(st);
+                                    else st.then(function(ShareToken) {
+                                        res.send(ShareToken);
+                                    });
                                 }).catch(function(err) {
                                     console.error("Invalid token request received by client.");
                                     res.sendStatus(400);
@@ -312,29 +312,28 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
 
                         }
                         if (text.email_verified && text.email_verified === 'true') {
-                            var year, month, curyear, curmnonth;
-                            const date = new Date();
-                            curyear = date.getFullYear();
-                            curmonth = date.getMonth();
-                            if (req.params.date !== "now") {
-                                year = req.params.date.split('.')[1];
-                                month = req.params.date.split('.')[0];
-                                if (year > curyear || month > curmonth) {
-                                    console.error("Invalid token request received by client.");
-                                    res.sendStatus(400);
-                                    return;
-                                }
+                            var year, month;
+                            const date = loi_utils.handleDate(req.params.date);
+
+                            if (date === 'null') {
+                                console.error("Invalid token request received by client.");
+                                res.sendStatus(400);
+                                return;
                             } else {
-                                year = curyear;
-                                month = curmonth;
+                                year = date.year;
+                                month = date.month;
                             }
 
                             console.log("Received request for email: " + text.email + " for provider: " + req.params.prov + " and group flag: " + req.params.group + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
                             var Email = text.email;
-                            if (req.params.anon === "1" && req.params.group === "0") Email = req.params.token;
-                            else if (req.params.anon === "1" && req.params.group === "1") Email = req.params.token + "@" + text.email.split('@')[1];
+                            if (req.params.anon === "1" && req.params.group === "0") Email = utils.bytesToHex(sha256.sha256(req.params.token));
+                            else if (req.params.anon === "1" && req.params.group === "1") Email = utils.bytesToHex(sha256.sha256(req.params.token)) + "@" + text.email.split('@')[1];
                             const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
-                            res.send(st);
+                            if (req.params.ethereum === 'null')
+                                res.send(st);
+                            else st.then(function(ShareToken) {
+                                res.send(ShareToken);
+                            });
                         } else {
                             console.error("Invalid token request received by client.");
                             res.sendStatus(400);

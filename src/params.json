@@ -6,8 +6,12 @@
         "FACEBOOK_SECRET_ID": "",
         "TIMEOUT_CHALLENGE": "1800",
         "DIC_IT_AGE_LIMIT": "19",
-	"nsoVersion": "2.8.1",
-	"INFURA_API_KEY": "",
-	"SignMessage": "Do not sign this message in any application different than League of Identity. The signature will be used to authenticate to the League of Identity network. Params:" 
+        "nsoVersion": "2.8.1",
+        "TINY_URL": "https://tinyurl.com/",
+        "API_TINY": "https://tinyurl.com/api-create.php?url=",
+        "API_PATH": "/",
+        "API_URL": "https://aragon.org",
+        "INFURA_API_KEY": "",
+        "SignMessage": "Do not sign this message in any application different than League of Identity. The signature will be used to authenticate to the League of Identity network. Params:"
     }
 }

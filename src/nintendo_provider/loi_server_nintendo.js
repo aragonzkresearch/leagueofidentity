@@ -124,22 +124,18 @@ function loi_server_nintendo(req, res, options) {
                         const Email = UserInfo.id;
 
                         console.log("Received request for email: " + Email + " for provider: " + req.params.prov + " and group flag: " + req.params.group + " and friends param: " + req.params.friends + " and anon param: " + req.params.anon + " and ethereum mode: " + req.params.ethereum);
-                        var year, month, curyear, curmnonth;
-                        const date = new Date();
-                        curyear = date.getFullYear();
-                        curmonth = date.getMonth();
-                        if (req.params.date !== "now") {
-                            year = req.params.date.split('.')[1];
-                            month = req.params.date.split('.')[0];
-                            if (year > curyear || month > curmonth) {
-                                console.error("Invalid token request received by client.");
-                                res.sendStatus(400);
-                                return;
-                            }
+                        var year, month;
+                        const date = loi_utils.handleDate(req.params.date);
+
+                        if (date === 'null') {
+                            console.error("Invalid token request received by client.");
+                            res.sendStatus(400);
+                            return;
                         } else {
-                            year = curyear;
-                            month = curmonth;
+                            year = date.year;
+                            month = date.month;
                         }
+
                         const st = cts.ComputeTokenShare(Email, options.share, month, year, req.params.group, req.params.prov, req.params.friends, req.params.anon, req.params.ethereum);
                         res.send(st);
                     }).catch(function(err) {
