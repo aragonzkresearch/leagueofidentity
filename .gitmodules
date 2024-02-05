@@ -1,0 +1,3 @@
+[submodule "LoI.SmartContracts"]
+	path = LoI.SmartContracts
+	url = https://github.com/vincenzoiovino/LoI.SmartContracts
