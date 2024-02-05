@@ -23,7 +23,7 @@ Consider the following applications scenarios:
 	- The `LoI` tokens could be used as anti-spam tool, specifically the token could be related to accounts that encompass properties that are hard to forge on large scale. The current demo for instance allow to get tokens for `facebook` accounts with at least `X` friends. More stringent might be required to combat bots.
 
 Moreover we envision the signature to satisfy the following property:
-* Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verifying such signatures on Ethereum would consume too much GAS. Instead, the `LoI` signatures for digital identity cards should be efficiently verifiable in Ethereum and other blockchains.
+* Efficient on-chain verification. The verification of the signature should be efficient for web3 applications. For instance, it is efficient to verify signatures of digital identity cards off-chain but verifying such signatures on Ethereum would consume too much GAS. Instead, the `LoI` signatures for digital identity cards should be efficiently verifiable in Ethereum and other blockchains. See [here](https://github.com/vincenzoiovino/LoI.SmartContracts) for example of Ethereum smart contracts using `LoI`.
 
 We stress that `LoI` aims at offering both encryption and authentication/signatures at the same time: satisfying these two properties together is usually more challenging than achieving just one of them. Encryption+signatures allow powerful applications, for instance a DAO of `@oldcrypto.com` can have encrypted proposals readable only by its members.
 
