@@ -1,5 +1,5 @@
 # League of Identity - PoC
-## Overview
+## Overview of the system
 This repository provides a PoC implementation of the ``League of Identity `` (`LoI`)  system described in this [note](https://hackmd.io/noiVZo2dTJ6Wiejt2IJvMg?view). 
 
 ``LoI`` is a network of nodes with the following functionalities. ``LoI`` publishes what is called a ``master public key`` (``MPK``).
