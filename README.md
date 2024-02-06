@@ -252,7 +252,7 @@ Unfortunately, `DICs` do not usually contain info like the Town of residency of 
 However, a `DIC` does often store another certificate signed with the citizen's certificate that in turn does contain additional information like the town, street, etc. of residency of the citizen.
 Therefore, it should be possible to extend the current demo to have the user to send this additional certificate in order to get a token corresponding e.g. to a given town.
 
-### Smart contracts
+## Smart contracts
 See [here](https://github.com/vincenzoiovino/LoI.SmartContracts) for examples of smart contracts using LoI.
 
 ## TODOs
