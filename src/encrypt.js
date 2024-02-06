@@ -32,6 +32,7 @@ commander
     .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine.')
     .option('-t, --tinyurl', 'Use tinyurl.com service to compress the ciphertext to a short string.')
     .option('-h, --hex', 'Output the ciphertext as hexadecimal string. Useful in combination with \'-t\' to output the path of the tinyurl site to use in Ethereum DApps. Use it only in combination with the option \'-t\'.')
+    .option('-b, --blik <value>', 'Compute a ciphertext for a random 32 bytes string x and in addition output the hash of x in the file <value>. The content of the file <value> will be in hex format.')
     .parse(process.argv);
 
 try {
@@ -49,11 +50,20 @@ try {
     //const month = options.month.split('.')[0];
     //const year = options.month.split('.')[1];
     const email = options.email;
-    var Log;
+
+    var Log, LogBlik, InputBlik;
     Log = new Console({
         stdout: options.output_ciphertext ? fs.createWriteStream(options.output_ciphertext) : process.stdout,
         stderr: process.stderr,
     });
+    if (options.blik) {
+        InputBlik = crypto.randomBytes(32);
+        console.log("DEBUG: chosen random value is: ", InputBlik);
+        LogBlik = new Console({
+            stdout: fs.createWriteStream(options.blik),
+            stderr: process.stderr,
+        });
+    }
     // for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
     if (options.cross_country) provider = provider.split('.')[0];
 
@@ -105,6 +115,47 @@ try {
 
     }
 
+    async function not_cca(msg, B, A) {
+        if (!options.blik) msg = hashes.utf8ToBytes(msg);
+        const length = msg.length;
+        const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
+        msg = hashes.bytesToHex(msg);
+        B = loi_utils.xor(hashes.bytesToHex(B_expanded), msg);
+        ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B;
+        Finalize(options, ciphertext, Log);
+    }
+
+    async function cca(msg, mpk, fp) {
+        if (!options.blik) msg = hashes.utf8ToBytes(msg);
+        const sigma = crypto.randomBytes(msg.length);
+        const sigma_msg = new Uint8Array(sigma.length + msg.length);
+        sigma_msg.set(sigma);
+        sigma_msg.set(msg, sigma.length);
+        const derived = hkdf.hkdf(sha256.sha256, sigma_msg, undefined, 'application', fetch_ethereum === 'null' ? 48 : 32);
+        if (fetch_ethereum !== 'null') {
+            FrTmp = new mcl.Fr();
+            //       FrTmp.setStr(utils.bytesToHex(derived), 16);
+            FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
+        }
+        const s = fetch_ethereum === 'null' ? fp.create(mod.hashToPrivateScalar(derived, bg.params.r)) : FrTmp;
+        const A = fetch_ethereum === 'null' ? bg.G2.ProjectivePoint.BASE.multiply(s) : mcl.mul(G2Base, s);
+        const mpk_to_s = fetch_ethereum === 'null' ? mpk.multiply(s) : mcl.mul(mpk, s);
+        const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + year + ".." + month + ".." + fetch_friends + ".." + fetch_anon + ".." + fetch_ethereum);
+        //const h = bg.G1.hashToCurve(id);
+        const h = eth.hashToCurve(id, fetch_ethereum, fetch_ethereum === 'null' ? bg : mcl);
+        const g_id = (fetch_ethereum === 'null' ? bg : mcl).pairing(h, mpk_to_s);
+        var B = fetch_ethereum === 'null' ? bg.fields.Fp12.toBytes(g_id) : g_id.getStr(16);
+        const length = msg.length;
+        const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
+        msg = hashes.bytesToHex(msg);
+        B = loi_utils.xor(hashes.bytesToHex(B_expanded), hashes.bytesToHex(sigma));
+        const sigma_expanded = hkdf.hkdf(sha256.sha256, sigma, undefined, 'application', sigma.length);
+        const C = loi_utils.xor(hashes.bytesToHex(sigma_expanded), msg);
+        if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
+        ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B + "." + C;
+        Finalize(options, ciphertext, Log);
+    }
+
     async function main() {
         const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
         const data = JSON.parse(JsonContent);
@@ -122,10 +173,8 @@ try {
             const randtmp = bg.utils.randomPrivateKey();
             const derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', fetch_ethereum === 'null' ? 48 : 32); // 48 bytes for 32-bytes input 
 
-
             if (fetch_ethereum !== 'null') {
                 FrTmp = new mcl.Fr();
-                //  FrTmp.setStr(utils.bytesToHex(derived), 16);
                 FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
             }
             const s = fetch_ethereum === 'null' ? fp.create(mod.hashToPrivateScalar(derived, bg.params.r)) : FrTmp;
@@ -136,62 +185,31 @@ try {
             const h = eth.hashToCurve(id, fetch_ethereum, fetch_ethereum === 'null' ? bg : mcl);
             const g_id = (fetch_ethereum === 'null' ? bg : mcl).pairing(h, mpk_to_s);
             var B = fetch_ethereum === 'null' ? bg.fields.Fp12.toBytes(g_id) : g_id.getStr(16);
-            loi_utils.read(process.stdin).then(function(msg) {
-                msg = hashes.utf8ToBytes(msg);
-                const length = msg.length;
-                const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
-                msg = hashes.bytesToHex(msg);
-                B = loi_utils.xor(hashes.bytesToHex(B_expanded), msg);
-                ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B;
-                Finalize(options, ciphertext, Log);
+            if (!options.blik) loi_utils.read(process.stdin).then(function(msg) {
+                not_cca(msg, B, A);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
+            else {
+                not_cca(InputBlik, B, A);
+                LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
+                console.log("DEBUG: hash written in hex format to file " + options.blik);
+            }
         } else {
-            loi_utils.read(process.stdin).then(function(msg) {
-                msg = hashes.utf8ToBytes(msg);
-                const sigma = crypto.randomBytes(msg.length);
-                const sigma_msg = new Uint8Array(sigma.length + msg.length);
-                sigma_msg.set(sigma);
-                sigma_msg.set(msg, sigma.length);
-                const derived = hkdf.hkdf(sha256.sha256, sigma_msg, undefined, 'application', fetch_ethereum === 'null' ? 48 : 32);
-                if (fetch_ethereum !== 'null') {
-                    FrTmp = new mcl.Fr();
-                    //       FrTmp.setStr(utils.bytesToHex(derived), 16);
-                    FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
-                }
-                const s = fetch_ethereum === 'null' ? fp.create(mod.hashToPrivateScalar(derived, bg.params.r)) : FrTmp;
-                const A = fetch_ethereum === 'null' ? bg.G2.ProjectivePoint.BASE.multiply(s) : mcl.mul(G2Base, s);
-                const mpk_to_s = fetch_ethereum === 'null' ? mpk.multiply(s) : mcl.mul(mpk, s);
-                const id = hashes.utf8ToBytes("LoI.." + provider + ".." + email + ".." + year + ".." + month + ".." + fetch_friends + ".." + fetch_anon + ".." + fetch_ethereum);
-                //const h = bg.G1.hashToCurve(id);
-                const h = eth.hashToCurve(id, fetch_ethereum, fetch_ethereum === 'null' ? bg : mcl);
-                const g_id = (fetch_ethereum === 'null' ? bg : mcl).pairing(h, mpk_to_s);
-                var B = fetch_ethereum === 'null' ? bg.fields.Fp12.toBytes(g_id) : g_id.getStr(16);
-                const length = msg.length;
-                const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
-                msg = hashes.bytesToHex(msg);
-                B = loi_utils.xor(hashes.bytesToHex(B_expanded), hashes.bytesToHex(sigma));
-                const sigma_expanded = hkdf.hkdf(sha256.sha256, sigma, undefined, 'application', sigma.length);
-                const C = loi_utils.xor(hashes.bytesToHex(sigma_expanded), msg);
-                if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
-                ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B + "." + C;
-                Finalize(options, ciphertext, Log);
-                /*if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
-                else {
-                    console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
-                    Log.log(ciphertext);
-                }
-*/
-
+            if (!options.blik) loi_utils.read(process.stdin).then(function(msg) {
+                cca(msg, mpk, fp);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
+            else {
+                cca(InputBlik, mpk, fp);
+                LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
+                console.log("DEBUG: hash written in hex format to file " + options.blik);
+            }
         }
     }
-
 } catch (err) {
     console.error("Encryption error: " + err.message);
     process.exit(1);

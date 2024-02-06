@@ -33,9 +33,10 @@ commander
     .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine.')
     .option('-t, --tinyurl', 'Use tinyurl.com service to compress the ciphertext to a short string.')
     .option('-h, --hex', 'Interpret the ciphertext as hexadecimal string and convert it to binary before using it for decryption. Useful in combination with \'-t\'. Use it only in combination with the option \'-t\'.')
+    .option('-hm, --hex_msg', 'Output the message as hex string.')
     .parse(process.argv);
 
-    var TINYURL_SERVICE, API_URL_FOR_TINY_PATH;
+var TINYURL_SERVICE, API_URL_FOR_TINY_PATH;
 async function getLongURL(CT) {
     var request = TINYURL_SERVICE + CT;
     return fetch(request).then(function(response) {
@@ -78,10 +79,10 @@ try {
 
     async function main() {
         try {
-        const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
-        const data = JSON.parse(JsonContent);
-        TINYURL_SERVICE = data.params.TINYURL_SERVICE;
-        API_URL_FOR_TINY_PATH = data.params.API_URL_FOR_TINY_PATH;
+            const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
+            const data = JSON.parse(JsonContent);
+            TINYURL_SERVICE = data.params.TINYURL_SERVICE;
+            API_URL_FOR_TINY_PATH = data.params.API_URL_FOR_TINY_PATH;
             const fp = mod.Field(fetch_ethereum === 'null' ? bg.params.r : bg.CURVE.n);
             const month = loi_utils.getMonth(options);
             const year = loi_utils.getYear(options);
@@ -100,7 +101,7 @@ try {
             if (options.hex) ciphertext = new TextDecoder().decode(utils.hexToBytes(ciphertext));
             if (options.tinyurl) {
                 ciphertext = await getLongURL(ciphertext);
-                ciphertext = decodeURI(new URL(ciphertext).pathname.substr(API_URL_FOR_TINY_PATH.length)); 
+                ciphertext = decodeURI(new URL(ciphertext).pathname.substr(API_URL_FOR_TINY_PATH.length));
 
             }
 
@@ -131,11 +132,11 @@ try {
                 const B_expanded = hkdf.hkdf(sha256.sha256, B_computed, undefined, 'application', length);
                 B_computed = hashes.bytesToHex(B_expanded);
                 var decoder = new TextDecoder();
-                if (!options.output_msg) console.log("decrypted message: " + decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B))));
+                if (!options.output_msg) console.log("decrypted message: " + (options.hex_msg ? loi_utils.xor(B_computed, B) : decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B)))));
                 else {
 
                     console.log("DEBUG: decrypted message written to file " + options.output_msg);
-                    Log.log(decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B))));
+                    Log.log(options.hex_msg ? loi_utils.xor(B_computed, B) : decoder.decode(utils.hexToBytes(loi_utils.xor(B_computed, B))));
                 }
 
             } else {
@@ -180,11 +181,11 @@ try {
 
                 else success_flag = A_computed.getStr(16) === A.getStr(16) ? "1" : "0";
                 var decoder = new TextDecoder();
-                if (!options.output_msg) console.log("decrypted flag+message: " + success_flag + decoder.decode(msg));
+                if (!options.output_msg) console.log("decrypted flag+message: " + success_flag + (options.hex_msg ? utils.bytesToHex(msg) : decoder.decode(msg)));
                 else {
 
                     console.log("DEBUG: decrypted flag+message written to file " + options.output_msg);
-                    Log.log(success_flag + decoder.decode(msg));
+                    Log.log(success_flag + (options.hex_msg ? utils.bytesToHex(msg) : decoder.decode(msg)));
                 }
 
 
