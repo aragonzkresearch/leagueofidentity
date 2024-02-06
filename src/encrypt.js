@@ -35,7 +35,7 @@ commander
     .parse(process.argv);
 
 try {
-    var API_TINY, API_PATH, API_URL;
+    var TINYURL_SERVICE, API_URL_FOR_TINY_PATH, API_URL_FOR_TINY;
     const options = commander.opts();
     var provider;
     provider = loi_utils.handleProviders(options, provider);
@@ -75,7 +75,7 @@ try {
 
 
     async function getTinyURL(CT) {
-        var request = API_TINY + API_URL + CT;
+        var request = API_TINY_URL + API_URL_FOR_TINY + CT;
 
         return fetch(request).then(function(response) {
             return response.text();
@@ -90,7 +90,7 @@ try {
 
                 getTinyURL(ciphertext).then(function(text) {
                     console.log("DEBUG: ciphertext written to file " + options.output_ciphertext);
-                    text = new URL(text).pathname.substr(API_PATH.length);
+                    text = new URL(text).pathname.substr(API_URL_FOR_TINY_PATH.length);
                     if (options.hex) text = utils.bytesToHex(hashes.utf8ToBytes(text));
                     Log.log(text);
                 }).catch((err) => {
@@ -108,9 +108,9 @@ try {
     async function main() {
         const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
         const data = JSON.parse(JsonContent);
-        API_TINY = data.params.API_TINY;
-        API_PATH = data.params.API_PATH;
-        API_URL = data.params.API_URL + API_PATH; // Just as example. Change it in real implementations.
+        API_TINY_URL = data.params.API_TINY_URL;
+        API_URL_FOR_TINY_PATH = data.params.API_URL_FOR_TINY_PATH;
+        API_URL_FOR_TINY = data.params.API_URL_FOR_TINY + API_URL_FOR_TINY_PATH; // Just as example. Change it in real implementations.
         var ciphertext;
         const fp = mod.Field(fetch_ethereum === 'null' ? bg.params.r : bg.CURVE.n);
         if (fetch_ethereum !== 'null') {

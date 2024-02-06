@@ -35,9 +35,9 @@ commander
     .option('-h, --hex', 'Interpret the ciphertext as hexadecimal string and convert it to binary before using it for decryption. Useful in combination with \'-t\'. Use it only in combination with the option \'-t\'.')
     .parse(process.argv);
 
-    var TINY_URL, API_PATH;
+    var TINYURL_SERVICE, API_URL_FOR_TINY_PATH;
 async function getLongURL(CT) {
-    var request = TINY_URL + CT;
+    var request = TINYURL_SERVICE + CT;
     return fetch(request).then(function(response) {
         return response.url;
     }).catch(function(err) {
@@ -80,8 +80,8 @@ try {
         try {
         const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
         const data = JSON.parse(JsonContent);
-        TINY_URL = data.params.TINY_URL;
-        API_PATH = data.params.API_PATH;
+        TINYURL_SERVICE = data.params.TINYURL_SERVICE;
+        API_URL_FOR_TINY_PATH = data.params.API_URL_FOR_TINY_PATH;
             const fp = mod.Field(fetch_ethereum === 'null' ? bg.params.r : bg.CURVE.n);
             const month = loi_utils.getMonth(options);
             const year = loi_utils.getYear(options);
@@ -100,7 +100,7 @@ try {
             if (options.hex) ciphertext = new TextDecoder().decode(utils.hexToBytes(ciphertext));
             if (options.tinyurl) {
                 ciphertext = await getLongURL(ciphertext);
-                ciphertext = decodeURI(new URL(ciphertext).pathname.substr(API_PATH.length)); 
+                ciphertext = decodeURI(new URL(ciphertext).pathname.substr(API_URL_FOR_TINY_PATH.length)); 
 
             }
 
