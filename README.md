@@ -48,11 +48,11 @@ You can switch to such version using the command:
 nvm install 16.20.2
 ```
 For the web part the only required package is `hello.js` but a stand-alone version is embedded in the `web` folder.
-For the `node.js` part the required packages are (some of them could not be currently used) `fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser, web3, request-promise-native` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
+For the `node.js` part the required packages are (some of them could not be currently used) `node-fetch, express, nocache, cors, commander, console, fs, shelljs, body-parser, web3, request-promise-native` and [`noble-curves`](https://github.com/paulmillr/noble-curves).
 To install them, run:
 ```bash
 npm install --save express
-npm install --save fetch
+npm install --save node-fetch
 npm install --save nocache
 npm install --save cors
 npm install --save commander
@@ -62,9 +62,9 @@ npm install --save shelljs
 npm install --save body-parser
 npm install --save web3
 npm install --save request-promise-native
-npm install --save @noble-curves@1.2.0
+npm install --save @noble/curves@1.2.0
 ```
-Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with fetch, try to install the version `1.1.0` that we used for the tests.
+Note that for `noble-curves` we stick to the version `1.2.0` we used for the tests. You can try to use newer versions of `node` and `noble-curves` by tweaking the files (e.g., replacing `require` directives with `import` directives). If you have issues with `node-fetch` (resp. `commander`), try to install the version `1.1.0` (resp. `11.1.0`) that we used for the tests.
 
 ### Prerequisites
 It is strongly suggested that you create a Google developer account and get your `client id` (see below) that must be set in the file `src/params.json`. However, it is likely that you will be able to use the demo for the provider `google` even without that.
