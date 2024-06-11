@@ -127,12 +127,12 @@ You can replace it with a real `DKG` procedure without trusted dealer but for si
 
 Now, you can run locally 3 `LoI` nodes with the following commands:
 ```bash
-node loi_server.js -p 8001 -s share1 &
-node loi_server.js -p 8002 -s share2 &
-node loi_server.js -p 8003 -s share3 &
+node loi_server.js -p 8001 -s share1 -i 1 &
+node loi_server.js -p 8002 -s share2 -i 2 &
+node loi_server.js -p 8003 -s share3 -i 3 &
 ```
 Do not forget to store in the files `share1`, `share2`, `share3` the previously computed values. This runs 3 servers on the respective ports `8001`, `8002`, `8003`.
-Each server is implicitly associated resp. with the index `1,2,3`.
+Each server is associated  with the indices resp. `1,2,3` provided with the '-i' argument.
 ### Get a `token` from `LoI`.
 Now you can run the following:
 ```bash
