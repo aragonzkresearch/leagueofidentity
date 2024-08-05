@@ -33,12 +33,28 @@ commander
     .option('-t, --tinyurl', 'Use tinyurl.com service to compress the ciphertext to a short string.')
     .option('-h, --hex', 'Output the ciphertext as hexadecimal string. Useful in combination with \'-t\' to output the path of the tinyurl site to use in Ethereum DApps. Use it only in combination with the option \'-t\'.')
     .option('-b, --blik <value>', 'Compute a ciphertext for a random 32 bytes string x and in addition output the hash of x in the file <value>. The content of the file <value> will be in hex format.')
+    .option('-bf, --blik_full <value>', 'Compute a ciphertext for use in the full Blik system and store in the file <value> the value A (see documentation). The content of the file <value> will be in hex format. This option is compatible only with the options \'--ethereum\' and \'--cca2\'.')
     .parse(process.argv);
 
 try {
     var TINYURL_SERVICE, API_URL_FOR_TINY_PATH, API_URL_FOR_TINY;
     const options = commander.opts();
     var provider;
+    if (options.blik && options.blik_full) {
+
+        console.error("Option --blik is incompatible with option --blik_full");
+        process.exit(1);
+    }
+    if (options.blik_full && !options.cca2) {
+
+        console.error("Option --blik_full is only compatible with option --cca2");
+        process.exit(1);
+    }
+    if (options.blik_full && !options.ethereum) {
+
+        console.error("Option --blik_full is only compatible with option --ethereum");
+        process.exit(1);
+    }
     provider = loi_utils.handleProviders(options, provider);
     const month = loi_utils.getMonth(options);
     const year = loi_utils.getYear(options);
@@ -56,11 +72,11 @@ try {
         stdout: options.output_ciphertext ? fs.createWriteStream(options.output_ciphertext) : process.stdout,
         stderr: process.stderr,
     });
-    if (options.blik) {
+    if (options.blik || options.blik_full) {
         InputBlik = crypto.randomBytes(32);
         console.log("DEBUG: chosen random value is: ", InputBlik);
         LogBlik = new Console({
-            stdout: fs.createWriteStream(options.blik),
+            stdout: fs.createWriteStream(options.blik ? options.blik : options.blik_full),
             stderr: process.stderr,
         });
     }
@@ -116,7 +132,7 @@ try {
     }
 
     async function not_cca(msg, B, A) {
-        if (!options.blik) msg = hashes.utf8ToBytes(msg);
+        if (!options.blik && !options.blik_full) msg = hashes.utf8ToBytes(msg);
         const length = msg.length;
         const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
         msg = hashes.bytesToHex(msg);
@@ -125,8 +141,8 @@ try {
         Finalize(options, ciphertext, Log);
     }
 
-    async function cca(msg, mpk, fp) {
-        if (!options.blik) msg = hashes.utf8ToBytes(msg);
+    async function cca(msg, mpk, fp, blik_full) {
+        if (!options.blik && !options.blik_full) msg = hashes.utf8ToBytes(msg);
         const sigma = crypto.randomBytes(msg.length);
         const sigma_msg = new Uint8Array(sigma.length + msg.length);
         sigma_msg.set(sigma);
@@ -150,10 +166,22 @@ try {
         msg = hashes.bytesToHex(msg);
         B = loi_utils.xor(hashes.bytesToHex(B_expanded), hashes.bytesToHex(sigma));
         const sigma_expanded = hkdf.hkdf(sha256.sha256, sigma, undefined, 'application', sigma.length);
+        console.log("msg to hex:" + msg);
         const C = loi_utils.xor(hashes.bytesToHex(sigma_expanded), msg);
-        if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
         ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B + "." + C;
+        //if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
         Finalize(options, ciphertext, Log);
+        if (blik_full) { // blik_full is only available for ethereum mode
+            FrTmp = new mcl.Fr();
+            FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(InputBlik))), 16);
+            const D = mcl.mul(h, FrTmp);
+            ciphertext = ciphertext + "." + D.getStr(16);
+            console.log("." + D.getStr(16));
+            LogBlik.log(D.getStr(16));
+            console.log("value D as ethereum tuple: " + "[" + D.getStr(10).split(' ')[1] + "," + D.getStr(10).split(' ')[2] + "]\",\n");
+            //LogBlik.log(D.getStr(16).split(' ')[1]+ " "+D.getStr(16).split(' ')[2]);
+            console.log("DEBUG: value D written in hex format to file " + options.blik_full);
+        }
     }
 
     async function main() {
@@ -185,28 +213,30 @@ try {
             const h = eth.hashToCurve(id, fetch_ethereum, fetch_ethereum === 'null' ? bg : mcl);
             const g_id = (fetch_ethereum === 'null' ? bg : mcl).pairing(h, mpk_to_s);
             var B = fetch_ethereum === 'null' ? bg.fields.Fp12.toBytes(g_id) : g_id.getStr(16);
-            if (!options.blik) loi_utils.read(process.stdin).then(function(msg) {
+            if (!options.blik && !options.blik_full) loi_utils.read(process.stdin).then(function(msg) {
                 not_cca(msg, B, A);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
-            else {
+            else if (options.blik) {
                 not_cca(InputBlik, B, A);
                 LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
                 console.log("DEBUG: hash written in hex format to file " + options.blik);
             }
         } else {
-            if (!options.blik) loi_utils.read(process.stdin).then(function(msg) {
-                cca(msg, mpk, fp);
+            if (!options.blik && !options.blik_full) loi_utils.read(process.stdin).then(function(msg) {
+                cca(msg, mpk, fp, false);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
-            else {
-                cca(InputBlik, mpk, fp);
+            else if (options.blik) {
+                cca(InputBlik, mpk, fp, false);
                 LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
                 console.log("DEBUG: hash written in hex format to file " + options.blik);
+            } else if (options.blik_full) {
+                cca(InputBlik, mpk, fp, true);
             }
         }
     }

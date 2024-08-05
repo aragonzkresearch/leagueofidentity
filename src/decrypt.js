@@ -31,9 +31,13 @@ commander
     .option('-cca2, --cca2', 'decrypt with security against adaptive chosen ciphertext attacks. This is the strongest form of security. The first byte of the decrypted message will be 0/1 to denote failure or success of decryption.')
     .option('-cc, --cross_country', 'For digital identity cards (DICs) only: if this option is set the provider info used to perform cryptographic operations will be shortned to \'dic\' rather than e.g., \'dic.it\'. In this way, a token for e.g. a Spanish DIC and an Italian DIC will correspond to the same provider (i.e., \'dic\'). Even if this option is used you must anyway specify the full provider (e.g., \'dic.it\') in order to perform operations that are country specific.')
     .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine.')
-    .option('-t, --tinyurl', 'Use tinyurl.com service to compress the ciphertext to a short string.')
+    .option('-t, --tinyurl', 'Use tinyurl.com service to decompress the tinyurl represeting the ciphertext.')
     .option('-h, --hex', 'Interpret the ciphertext as hexadecimal string and convert it to binary before using it for decryption. Useful in combination with \'-t\'. Use it only in combination with the option \'-t\'.')
     .option('-hm, --hex_msg', 'Output the message as hex string.')
+    .option('-bfi, --blik_full_input <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified in the file <value>  and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file specified by the option \'--blik_full_output\' (see documentation). This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_output\' and \'--addr\'.')
+    .option('-bfo, --blik_full_output <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified by the option \'--blik_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_input\' and \'--addr\'.')
+    .option('-addr, --addr <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified by the option \'--blik_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_input\' and \'--blik_full_output\'.')
+    .option('-bj, --blik_json <value>', 'Write the withdrawal proof in JSON format in the file <value>.')
     .parse(process.argv);
 
 var TINYURL_SERVICE, API_URL_FOR_TINY_PATH;
@@ -56,6 +60,40 @@ try {
         stdout: options.output_msg ? fs.createWriteStream(options.output_msg) : process.stdout,
         stderr: process.stderr,
     });
+    LogJson = new Console({
+        stdout: options.blik_json ? fs.createWriteStream(options.blik_json) : process.stdout,
+        stderr: process.stderr,
+    });
+    if (options.blik_full_output) LogBlikOutput = new Console({
+        stdout: fs.createWriteStream(options.blik_full_output),
+        stderr: process.stderr,
+    });
+
+    if (options.blik_full && !options.cca2) {
+
+        console.error("Option --blik is only compatible with option --cca2");
+        process.exit(1);
+    }
+    if (options.blik_full_input && !options.ethereum) {
+
+        console.error("Option --blik_full_input is only compatible with option --ethereum");
+        process.exit(1);
+    }
+    if (options.blik_full_input && !options.ethereum) {
+
+        console.error("Option --blik_full_input is only compatible with option --ethereum");
+        process.exit(1);
+    }
+    if (options.blik_full_input && !options.addr) {
+
+        console.error("Option --blik_full_input is only compatible with option --addr");
+        process.exit(1);
+    }
+    if (options.blik_full_output && !options.blik_full_input) {
+
+        console.error("Option --blik_full_output is only compatible with option --blik_full_input");
+        process.exit(1);
+    }
 
     const fetch_friends = loi_utils.handleOptionFriends(options, provider);
     const fetch_anon = loi_utils.handleOptionAnon(options, provider);
@@ -79,6 +117,7 @@ try {
 
     async function main() {
         try {
+            if (options.blik_full_input) LogBlikInput = await loi_utils.read(fs.createReadStream(options.blik_full_input));
             const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
             const data = JSON.parse(JsonContent);
             TINYURL_SERVICE = data.params.TINYURL_SERVICE;
@@ -102,7 +141,6 @@ try {
             if (options.tinyurl) {
                 ciphertext = await getLongURL(ciphertext);
                 ciphertext = decodeURI(new URL(ciphertext).pathname.substr(API_URL_FOR_TINY_PATH.length));
-
             }
 
             // for DIC only: if the options cross_country is set change the provider e.g. dic.it to just dic
@@ -165,7 +203,7 @@ try {
                 const sigma_msg = new Uint8Array(sigma.length + msg.length);
                 sigma_msg.set(sigma);
                 sigma_msg.set(msg, sigma.length);
-                const derived = hkdf.hkdf(sha256.sha256, sigma_msg, undefined, 'application', fetch_ethereum === 'null' ? 48 : 32); // 48 bytes for 32-bytes input 
+                var derived = hkdf.hkdf(sha256.sha256, sigma_msg, undefined, 'application', fetch_ethereum === 'null' ? 48 : 32); // 48 bytes for 32-bytes input 
 
                 if (fetch_ethereum !== 'null') {
                     FrTmp = new mcl.Fr();
@@ -181,6 +219,64 @@ try {
 
                 else success_flag = A_computed.getStr(16) === A.getStr(16) ? "1" : "0";
                 var decoder = new TextDecoder();
+                if (options.blik_full_input) {
+                    FrTmp = new mcl.Fr();
+                    FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(msg))), 16);
+                    const r = FrTmp;
+                    const Dprime = mcl.mul(h, r);
+                    const D = new mcl.G1();
+                    D.setStr(LogBlikInput, 16);
+
+                    var json_success = Dprime.getStr(16) === D.getStr(16) ? "1" : "0";
+                    randtmp = bg.utils.randomPrivateKey();
+                    derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 32);
+                    const s = new mcl.Fr();
+                    s.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
+                    const E = mcl.mul(D, s);
+                    var tokenprime = mcl.mul(token, r);
+                    const s_negate = mcl.neg(s);
+                    tokenprime = mcl.mul(tokenprime, s_negate); // Token'=Token^{-r*s}
+                    //console.log("pairing: " +mcl.pairing(tokenprime, G2Base).isEqual(mcl.pairing(E,mpk)));
+                    randtmp = bg.utils.randomPrivateKey();
+                    derived = hkdf.hkdf(sha256.sha256, randtmp, undefined, 'application', 32);
+                    const a = new mcl.Fr();
+                    a.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
+                    const pi_A = mcl.mul(D, a);
+                    const dot = hashes.utf8ToBytes(".");
+                    const input = new Uint8Array([...utils.hexToBytes(loi_utils.pad(E.getStr(16).split(' ')[1])), ...dot, ...utils.hexToBytes(loi_utils.pad(pi_A.getStr(16).split(' ')[1])), ...dot, ...utils.hexToBytes(options.addr)]); // we hash input = statement E + first message pi_A + addr. TODO: there is currently no check on the format of --options.addr, it should represent an ETH address and this should be checked.
+                    //console.log(input);
+                    derived = sha256.sha256(input);
+                    //console.log(derived);
+                    //console.log(utils.bytesToHex(derived));
+                    const e = new mcl.Fr();
+                    e.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(derived))), 16);
+                    // e is the hash of input converted to scalar
+                    const pi_z = mcl.add(a, mcl.mul(e, s)); // pi_z = a + e*s
+                    //                   const pi_z = mcl.add(a, s); // pi_z = a + s
+                    const Json =
+                        "{\n" +
+                        " \"data\": {\n" +
+                        "             \"success:\": \"" + json_success + "\",\n" +
+                        ((options.tinyurl && options.hex) ?
+                            "             \"ciphertext:\": \"0x" + options.ciphertext + "\",\n" : "") +
+                        "             \"addr:\": \"" + options.addr + "\",\n" +
+                        "             \"MPK:\": \"" + "[[" + mpk.getStr(10).split(' ')[2] + "," + mpk.getStr(10).split(' ')[1] + "],[" + mpk.getStr(10).split(' ')[4] + "," + mpk.getStr(10).split(' ')[3] + "]]" + "\",\n" +
+                        "             \"D:\": \"[" + D.getStr(10).split(' ')[1] + "," + D.getStr(10).split(' ')[2] + "]\",\n" +
+                        "             \"pi_as_ethereum_tuple:\": \"[[" + D.getStr(10).split(' ')[1] + "," + D.getStr(10).split(' ')[2] + "],[" + E.getStr(10).split(' ')[1] + "," + E.getStr(10).split(' ')[2] + "],[" + tokenprime.getStr(10).split(' ')[1] + "," + tokenprime.getStr(10).split(' ')[2] + "],[" + pi_A.getStr(10).split(' ')[1] + "," + pi_A.getStr(10).split(' ')[2] + "]," + pi_z.getStr() + "]\",\n" +
+                        //          "             \"Dx:\": \"" + D.getStr(16).split(' ')[1] + "\",\n" +
+                        //        "             \"Dy:\": \"" + D.getStr(16).split(' ')[2] + "\",\n" +
+                        //      "             \"Ex:\": \"" + E.getStr(16).split(' ')[1] + "\",\n" +
+                        //    "             \"Ey:\": \"" + E.getStr(16).split(' ')[2] + "\",\n" +
+                        //  "             \"Token\'x:\": \"" + tokenprime.getStr(16).split(' ')[1] + "\",\n" +
+                        // "             \"Token\'y:\": \"" + tokenprime.getStr(16).split(' ')[2] + "\",\n" +
+                        // "             \"pi_Ax\":   \"" + pi_A.getStr(16).split(' ')[1] + "\",\n" +
+                        // "             \"pi_Ay\":   \"" + pi_A.getStr(16).split(' ')[2] + "\",\n" +
+                        // "             \"pi_z\":    \"" + pi_z.getStr(16) + "\"\n" +
+                        "            }\n" +
+                        "}";
+                    if (options.blik_json) console.log("DEBUG: withdrawal proof in Json written to file " + options.blik_json);
+                    LogJson.log(Json);
+                }
                 if (!options.output_msg) console.log("decrypted flag+message: " + success_flag + (options.hex_msg ? utils.bytesToHex(msg) : decoder.decode(msg)));
                 else {
 
