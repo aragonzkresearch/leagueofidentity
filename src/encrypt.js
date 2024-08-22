@@ -32,27 +32,27 @@ commander
     .option('-eth, --ethereum', 'Use Ethereum mode to achieve efficient verifiability on the Ethereum virtual machine.')
     .option('-t, --tinyurl', 'Use tinyurl.com service to compress the ciphertext to a short string.')
     .option('-h, --hex', 'Output the ciphertext as hexadecimal string. Useful in combination with \'-t\' to output the path of the tinyurl site to use in Ethereum DApps. Use it only in combination with the option \'-t\'.')
-    .option('-b, --blik <value>', 'Compute a ciphertext for a random 32 bytes string x and in addition output the hash of x in the file <value>. The content of the file <value> will be in hex format.')
-    .option('-bf, --blik_full <value>', 'Compute a ciphertext for use in the full Blik system and store in the file <value> the value A (see documentation). The content of the file <value> will be in hex format. This option is compatible only with the options \'--ethereum\' and \'--cca2\'.')
+    .option('-p, --payment <value>', 'Compute a ciphertext for use in the AnonyIBP system. The command will output a ciphertext consisting of an encryption of a random 32 bytes string x and in addition will output the hash of x in the file <value>. The content of the file <value> will be in hex format.')
+    .option('-pf, --payment_full <value>', 'Compute a ciphertext for use in the full AnonIBP system and store in the file <value> the value A (see documentation). The content of the file <value> will be in hex format. This option is compatible only with the options \'--ethereum\' and \'--cca2\'.')
     .parse(process.argv);
 
 try {
     var TINYURL_SERVICE, API_URL_FOR_TINY_PATH, API_URL_FOR_TINY;
     const options = commander.opts();
     var provider;
-    if (options.blik && options.blik_full) {
+    if (options.payment && options.payment_full) {
 
-        console.error("Option --blik is incompatible with option --blik_full");
+        console.error("Option --payment is incompatible with option --payment_full");
         process.exit(1);
     }
-    if (options.blik_full && !options.cca2) {
+    if (options.payment_full && !options.cca2) {
 
-        console.error("Option --blik_full is only compatible with option --cca2");
+        console.error("Option --payment_full is only compatible with option --cca2");
         process.exit(1);
     }
-    if (options.blik_full && !options.ethereum) {
+    if (options.payment_full && !options.ethereum) {
 
-        console.error("Option --blik_full is only compatible with option --ethereum");
+        console.error("Option --payment_full is only compatible with option --ethereum");
         process.exit(1);
     }
     provider = loi_utils.handleProviders(options, provider);
@@ -67,16 +67,16 @@ try {
     //const year = options.month.split('.')[1];
     const email = options.email;
 
-    var Log, LogBlik, InputBlik;
+    var Log, LogIBP, InputIBP;
     Log = new Console({
         stdout: options.output_ciphertext ? fs.createWriteStream(options.output_ciphertext) : process.stdout,
         stderr: process.stderr,
     });
-    if (options.blik || options.blik_full) {
-        InputBlik = crypto.randomBytes(32);
-        console.log("DEBUG: chosen random value is: ", InputBlik);
-        LogBlik = new Console({
-            stdout: fs.createWriteStream(options.blik ? options.blik : options.blik_full),
+    if (options.payment || options.payment_full) {
+        InputIBP = crypto.randomBytes(32);
+        console.log("DEBUG: chosen random value is: ", InputIBP);
+        LogIBP = new Console({
+            stdout: fs.createWriteStream(options.payment ? options.payment : options.payment_full),
             stderr: process.stderr,
         });
     }
@@ -132,7 +132,7 @@ try {
     }
 
     async function not_cca(msg, B, A) {
-        if (!options.blik && !options.blik_full) msg = hashes.utf8ToBytes(msg);
+        if (!options.payment && !options.payment_full) msg = hashes.utf8ToBytes(msg);
         const length = msg.length;
         const B_expanded = hkdf.hkdf(sha256.sha256, B, undefined, 'application', length);
         msg = hashes.bytesToHex(msg);
@@ -141,8 +141,8 @@ try {
         Finalize(options, ciphertext, Log);
     }
 
-    async function cca(msg, mpk, fp, blik_full) {
-        if (!options.blik && !options.blik_full) msg = hashes.utf8ToBytes(msg);
+    async function cca(msg, mpk, fp, payment_full) {
+        if (!options.payment && !options.payment_full) msg = hashes.utf8ToBytes(msg);
         const sigma = crypto.randomBytes(msg.length);
         const sigma_msg = new Uint8Array(sigma.length + msg.length);
         sigma_msg.set(sigma);
@@ -171,16 +171,16 @@ try {
         ciphertext = length + "." + (fetch_ethereum === 'null' ? A.toHex() : A.getStr(16)) + "." + B + "." + C;
         //if (!options.output_ciphertext) console.log("ciphertext: " + ciphertext);
         Finalize(options, ciphertext, Log);
-        if (blik_full) { // blik_full is only available for ethereum mode
+        if (payment_full) { // payment_full is only available for ethereum mode
             FrTmp = new mcl.Fr();
-            FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(InputBlik))), 16);
+            FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(InputIBP))), 16);
             const D = mcl.mul(h, FrTmp);
             ciphertext = ciphertext + "." + D.getStr(16);
             console.log("." + D.getStr(16));
-            LogBlik.log(D.getStr(16));
+            LogIBP.log(D.getStr(16));
             console.log("value D as ethereum tuple: " + "[" + D.getStr(10).split(' ')[1] + "," + D.getStr(10).split(' ')[2] + "]\",\n");
-            //LogBlik.log(D.getStr(16).split(' ')[1]+ " "+D.getStr(16).split(' ')[2]);
-            console.log("DEBUG: value D written in hex format to file " + options.blik_full);
+            //LogIBP.log(D.getStr(16).split(' ')[1]+ " "+D.getStr(16).split(' ')[2]);
+            console.log("DEBUG: value D written in hex format to file " + options.payment_full);
         }
     }
 
@@ -213,30 +213,30 @@ try {
             const h = eth.hashToCurve(id, fetch_ethereum, fetch_ethereum === 'null' ? bg : mcl);
             const g_id = (fetch_ethereum === 'null' ? bg : mcl).pairing(h, mpk_to_s);
             var B = fetch_ethereum === 'null' ? bg.fields.Fp12.toBytes(g_id) : g_id.getStr(16);
-            if (!options.blik && !options.blik_full) loi_utils.read(process.stdin).then(function(msg) {
+            if (!options.payment && !options.payment_full) loi_utils.read(process.stdin).then(function(msg) {
                 not_cca(msg, B, A);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
-            else if (options.blik) {
-                not_cca(InputBlik, B, A);
-                LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
-                console.log("DEBUG: hash written in hex format to file " + options.blik);
+            else if (options.payment) {
+                not_cca(InputIBP, B, A);
+                LogIBP.log(utils.bytesToHex(sha256.sha256(InputIBP)));
+                console.log("DEBUG: hash written in hex format to file " + options.payment);
             }
         } else {
-            if (!options.blik && !options.blik_full) loi_utils.read(process.stdin).then(function(msg) {
+            if (!options.payment && !options.payment_full) loi_utils.read(process.stdin).then(function(msg) {
                 cca(msg, mpk, fp, false);
             }).catch((err) => {
                 console.error(err.message);
                 process.exit(1);
             });
-            else if (options.blik) {
-                cca(InputBlik, mpk, fp, false);
-                LogBlik.log(utils.bytesToHex(sha256.sha256(InputBlik)));
-                console.log("DEBUG: hash written in hex format to file " + options.blik);
-            } else if (options.blik_full) {
-                cca(InputBlik, mpk, fp, true);
+            else if (options.payment) {
+                cca(InputIBP, mpk, fp, false);
+                LogIBP.log(utils.bytesToHex(sha256.sha256(InputIBP)));
+                console.log("DEBUG: hash written in hex format to file " + options.payment);
+            } else if (options.payment_full) {
+                cca(InputIBP, mpk, fp, true);
             }
         }
     }

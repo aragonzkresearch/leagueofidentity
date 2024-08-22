@@ -39,10 +39,14 @@ commander
 const options = commander.opts();
 app.use(nocache());
 app.use(cors());
-app.listen(options.port, () => {
-    console.log('listening on port ' + options.port);
-});
-
+try {
+    app.listen(options.port, () => {
+        console.log('listening on port ' + options.port);
+    });
+} catch (err) {
+    console.error("Error " + err);
+    process.exit(1);
+}
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -373,5 +377,11 @@ loi_utils.read(fs.createReadStream("params.json")).then(function(JsonContent) {
 
         });
 
+    }).catch(function(err) {
+        console.error("Error opening share file: " + err);
+        process.exit(1);
     });
+}).catch(function(err) {
+    console.error("Error: " + err);
+    process.exit(1);
 });

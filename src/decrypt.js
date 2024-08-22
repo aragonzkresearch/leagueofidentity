@@ -34,10 +34,10 @@ commander
     .option('-t, --tinyurl', 'Use tinyurl.com service to decompress the tinyurl represeting the ciphertext.')
     .option('-h, --hex', 'Interpret the ciphertext as hexadecimal string and convert it to binary before using it for decryption. Useful in combination with \'-t\'. Use it only in combination with the option \'-t\'.')
     .option('-hm, --hex_msg', 'Output the message as hex string.')
-    .option('-bfi, --blik_full_input <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified in the file <value>  and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file specified by the option \'--blik_full_output\' (see documentation). This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_output\' and \'--addr\'.')
-    .option('-bfo, --blik_full_output <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified by the option \'--blik_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_input\' and \'--addr\'.')
-    .option('-addr, --addr <value>', 'Verify and decrypt a ciphertext of the full Blik system with respect to input specified by the option \'--blik_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--blik_full_input\' and \'--blik_full_output\'.')
-    .option('-bj, --blik_json <value>', 'Write the withdrawal proof in JSON format in the file <value>.')
+    .option('-pfi, --payment_full_input <value>', 'Verify and decrypt a ciphertext of the full AnonIBP system with respect to input specified in the file <value>  and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file specified by the option \'--payment_full_output\' (see documentation). This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--payment_full_output\' and \'--addr\'.')
+    .option('-pfo, --payment_full_output <value>', 'Verify and decrypt a ciphertext of the full AnonIBP system with respect to input specified by the option \'--payment_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--payment_full_input\' and \'--addr\'.')
+    .option('-addr, --addr <value>', 'Verify and decrypt a ciphertext of the full AnonIBP system with respect to input specified by the option \'--payment_full_input\' and ETH address specified by the option \'--addr\' and output the withdrawal proof in the file <value> (see documentation). The content of the file <value> will be in JSON format. This option is compatible only with the options \'--ethereum\' and \'--cca2\' and \'--payment_full_input\' and \'--payment_full_output\'.')
+    .option('-pj, --payment_json <value>', 'Write the withdrawal proof in JSON format in the file <value>.')
     .parse(process.argv);
 
 var TINYURL_SERVICE, API_URL_FOR_TINY_PATH;
@@ -61,37 +61,37 @@ try {
         stderr: process.stderr,
     });
     LogJson = new Console({
-        stdout: options.blik_json ? fs.createWriteStream(options.blik_json) : process.stdout,
+        stdout: options.payment_json ? fs.createWriteStream(options.payment_json) : process.stdout,
         stderr: process.stderr,
     });
-    if (options.blik_full_output) LogBlikOutput = new Console({
-        stdout: fs.createWriteStream(options.blik_full_output),
+    if (options.payment_full_output) LogIBPOutput = new Console({
+        stdout: fs.createWriteStream(options.payment_full_output),
         stderr: process.stderr,
     });
 
-    if (options.blik_full && !options.cca2) {
+    if (options.payment_full && !options.cca2) {
 
-        console.error("Option --blik is only compatible with option --cca2");
+        console.error("Option --payment is only compatible with option --cca2");
         process.exit(1);
     }
-    if (options.blik_full_input && !options.ethereum) {
+    if (options.payment_full_input && !options.ethereum) {
 
-        console.error("Option --blik_full_input is only compatible with option --ethereum");
+        console.error("Option --payment_full_input is only compatible with option --ethereum");
         process.exit(1);
     }
-    if (options.blik_full_input && !options.ethereum) {
+    if (options.payment_full_input && !options.ethereum) {
 
-        console.error("Option --blik_full_input is only compatible with option --ethereum");
+        console.error("Option --payment_full_input is only compatible with option --ethereum");
         process.exit(1);
     }
-    if (options.blik_full_input && !options.addr) {
+    if (options.payment_full_input && !options.addr) {
 
-        console.error("Option --blik_full_input is only compatible with option --addr");
+        console.error("Option --payment_full_input is only compatible with option --addr");
         process.exit(1);
     }
-    if (options.blik_full_output && !options.blik_full_input) {
+    if (options.payment_full_output && !options.payment_full_input) {
 
-        console.error("Option --blik_full_output is only compatible with option --blik_full_input");
+        console.error("Option --payment_full_output is only compatible with option --payment_full_input");
         process.exit(1);
     }
 
@@ -117,7 +117,7 @@ try {
 
     async function main() {
         try {
-            if (options.blik_full_input) LogBlikInput = await loi_utils.read(fs.createReadStream(options.blik_full_input));
+            if (options.payment_full_input) LogIBPInput = await loi_utils.read(fs.createReadStream(options.payment_full_input));
             const JsonContent = await loi_utils.read(fs.createReadStream("./params.json"));
             const data = JSON.parse(JsonContent);
             TINYURL_SERVICE = data.params.TINYURL_SERVICE;
@@ -219,13 +219,13 @@ try {
 
                 else success_flag = A_computed.getStr(16) === A.getStr(16) ? "1" : "0";
                 var decoder = new TextDecoder();
-                if (options.blik_full_input) {
+                if (options.payment_full_input) {
                     FrTmp = new mcl.Fr();
                     FrTmp.setStr(utils.numberToHexUnpadded(fp.create(utils.bytesToNumberBE(msg))), 16);
                     const r = FrTmp;
                     const Dprime = mcl.mul(h, r);
                     const D = new mcl.G1();
-                    D.setStr(LogBlikInput, 16);
+                    D.setStr(LogIBPInput, 16);
 
                     var json_success = Dprime.getStr(16) === D.getStr(16) ? "1" : "0";
                     randtmp = bg.utils.randomPrivateKey();
@@ -274,7 +274,7 @@ try {
                         // "             \"pi_z\":    \"" + pi_z.getStr(16) + "\"\n" +
                         "            }\n" +
                         "}";
-                    if (options.blik_json) console.log("DEBUG: withdrawal proof in Json written to file " + options.blik_json);
+                    if (options.payment_json) console.log("DEBUG: withdrawal proof in Json written to file " + options.payment_json);
                     LogJson.log(Json);
                 }
                 if (!options.output_msg) console.log("decrypted flag+message: " + success_flag + (options.hex_msg ? utils.bytesToHex(msg) : decoder.decode(msg)));
