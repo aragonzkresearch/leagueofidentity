@@ -28,19 +28,36 @@ const eth_provider = require("./eth_provider/loi_server_eth");
 const nintendo_provider = require("./nintendo_provider/loi_server_nintendo");
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const https = require('https');
 commander
     .version('1.0.0', '-v, --version')
     .usage('-p <value> -s <value>')
     .requiredOption('-p, --port <value>', 'port on which to listen.')
     .requiredOption('-s, --share <value>', 'file containing the share of the master secret key.')
     .requiredOption('-i, --index <value>', 'index of the server. This option is necessary to deal with digital identity cards (DICs) authentication.')
+    .option('-ssl, --ssl', 'use ssl.')
+    .option('-c, --cer <value>', 'certificate of the server.')
+    .option('-k, --key <value>', 'secret key of the server.')
     .parse(process.argv);
 
 const options = commander.opts();
 app.use(nocache());
 app.use(cors());
+var httpsServer;
+if (options.ssl) {
+    const privateKey = fs.readFileSync(options.key, 'utf8');
+    const certificate = fs.readFileSync(options.cer, 'utf8');
+
+    const credentials = {
+        key: privateKey,
+        cert: certificate
+    };
+    httpsServer = https.createServer(credentials, app);
+
+
+} else httpsServer = app;
 try {
-    app.listen(options.port, () => {
+    httpsServer.listen(options.port, () => {
         console.log('listening on port ' + options.port);
     });
 } catch (err) {
