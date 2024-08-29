@@ -1,6 +1,6 @@
 {
     "params": {
-        "GOOGLE_CLIENT_ID": "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com",
+	"GOOGLE_CLIENT_ID": "525900358521-qqueujfcj3cth26ci3humunqskjtcm56.apps.googleusercontent.com",
         "GOOGLE_API_KEY": "",
         "FACEBOOK_CLIENT_ID": "377291984666448",
         "FACEBOOK_SECRET_ID": "",
